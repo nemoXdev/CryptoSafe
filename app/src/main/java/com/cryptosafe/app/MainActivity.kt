@@ -21,6 +21,7 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
@@ -151,7 +152,7 @@ fun InputFields(pass: String, text: String, showPass: Boolean, setPass: (String)
         value = pass, onValueChange = setPass,
         label = { Text("Password / كلمة المرور") },
         modifier = Modifier.fillMaxWidth(),
-        visualTransformation = if (showPass) PasswordVisualTransformation() else PasswordVisualTransformation(),
+        visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
         trailingIcon = { IconButton(onClick = togglePass) { Icon(if (showPass) Icons.Default.Visibility else Icons.Default.VisibilityOff, null) } },
         keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password)
     )
