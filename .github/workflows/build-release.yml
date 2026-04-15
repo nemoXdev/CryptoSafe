@@ -28,7 +28,7 @@ jobs:
       - name: Build Release APK
         uses: gradle/gradle-build-action@v3
         with:
-          gradle-version: 8.10.2   # <-- هذا السطر يحل مشكلة Gradle 9
+          gradle-version: 8.11.1   # بدلاً من 8.10.2
           arguments: assembleRelease
         env:
           KEYSTORE_FILE: release.keystore
