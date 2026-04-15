@@ -1,4 +1,5 @@
-name: Build & Sign Release APK
+name: Build Signed Release APK
+
 on:
   push:
     branches: [ main ]
@@ -15,31 +16,28 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: gradle
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-        
-      - name: Generate Temporary Keystore
-        run: |
-          keytool -genkeypair -v \
-          -keystore release.keystore \
-          -alias crypto-safe-key \
-          -keyalg RSA -keysize 2048 -validity 10000 \
-          -storepass github-action-temp \
-          -keypass github-action-temp \
-          -dname "CN=CryptoSafe App, OU=OpenSource, O=Community, L=Unknown, ST=Unknown, C=XX" \
-          -deststoretype pkcs12
 
-      - name: Build Release APK
+      # --- خطوة التوقيع الرسمي ---
+      - name: Generate Release Keystore
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > release.keystore
+        env:
+          RELEASE_KEYSTORE: ${{ secrets.RELEASE_KEYSTORE }}
+
+      - name: Build Signed Release APK
         run: gradle assembleRelease
         env:
-          RELEASE_KEYSTORE: release.keystore
-          RELEASE_KEYSTORE_PASSWORD: github-action-temp
-          RELEASE_KEY_ALIAS: crypto-safe-key
-          RELEASE_KEY_PASSWORD: github-action-temp
+          KEYSTORE_FILE: release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload Release APK
+      - name: Upload Signed APK
         uses: actions/upload-artifact@v4
         with:
-          name: CryptoSafe-Release
+          name: CryptoSafe-Signed-Release
           path: app/build/outputs/apk/release/app-release.apk
