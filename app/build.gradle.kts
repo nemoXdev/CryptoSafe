@@ -1,7 +1,6 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    id("com.android.application") version "8.2.2"
+    id("org.jetbrains.kotlin.android") version "1.9.22"
 }
 
 android {
@@ -14,15 +13,14 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-        vectorDrawables { useSupportLibrary = true }
     }
 
     signingConfigs {
         create("release") {
-            storeFile = file(System.getenv("RELEASE_KEYSTORE") ?: "debug.keystore")
-            storePassword = System.getenv("RELEASE_KEYSTORE_PASSWORD") ?: "android"
-            keyAlias = System.getenv("RELEASE_KEY_ALIAS") ?: "androiddebugkey"
-            keyPassword = System.getenv("RELEASE_KEY_PASSWORD") ?: "android"
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "release.keystore")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
         }
     }
 
@@ -38,10 +36,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
-    buildFeatures { compose = true }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.8" }
-    packaging { resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" } }
+    
+    kotlinOptions { 
+        jvmTarget = "17" 
+    }
+    
+    buildFeatures {
+        compose = true
+    }
+    
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.8"
+    }
 }
 
 dependencies {
