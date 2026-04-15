@@ -22,7 +22,7 @@ object CryptoEngine {
      * Encrypts plaintext using a password.
      * Returns a single Base64 string containing: [Salt][IV][Ciphertext+AuthTag]
      */
-    fun encrypt(plainText: String, password: String): String {
+    fun encrypt(plainText: String, password: CharArray): String {
         val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
         val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
         val key = deriveKey(password, salt)
@@ -39,7 +39,7 @@ object CryptoEngine {
      * Decrypts a Base64 encoded string using the same password.
      * Fails if password is incorrect or data is tampered.
      */
-    fun decrypt(encoded: String, password: String): String {
+    fun decrypt(encoded: String, password: CharArray): String {
         val combined = android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP)
         if (combined.size < SALT_LENGTH + IV_LENGTH + 16) {
             throw IllegalArgumentException("Invalid encrypted data format")
@@ -56,21 +56,25 @@ object CryptoEngine {
         return cipher.doFinal(ciphertext).toString(Charsets.UTF_8)
     }
 
-    private fun deriveKey(password: String, salt: ByteArray): ByteArray {
+    private fun deriveKey(password: CharArray, salt: ByteArray): ByteArray {
         val factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
-        val spec = PBEKeySpec(password.toCharArray(), salt, PBKDF2_ITERATIONS, KEY_LENGTH)
-        return factory.generateSecret(spec).encoded
+        val spec = PBEKeySpec(password, salt, PBKDF2_ITERATIONS, KEY_LENGTH)
+        val key = factory.generateSecret(spec).encoded
+        // Clear the password spec for security
+        spec.clearPassword()
+        return key
     }
 
     /**
      * Evaluates password strength. Returns score (0-4) and level text.
      */
-    fun checkPasswordStrength(password: String): Pair<Int, String> {
+    fun checkPasswordStrength(password: CharArray): Pair<Int, String> {
         var score = 0
-        if (password.length >= 10) score++
-        if (password.any { it.isLetter() }) score++
-        if (password.any { it.isDigit() }) score++
-        if (password.any { !it.isLetterOrDigit() }) score++
+        val passStr = password.concatToString()
+        if (passStr.length >= 10) score++
+        if (passStr.any { it.isLetter() }) score++
+        if (passStr.any { it.isDigit() }) score++
+        if (passStr.any { !it.isLetterOrDigit() }) score++
 
         val level = when (score) {
             0, 1 -> "Weak / ضعيف"
