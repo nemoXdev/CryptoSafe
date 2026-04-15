@@ -37,6 +37,8 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: release
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          GRADLE_OPTS: "-Xmx2048m"
+          JAVA_OPTS: "-Xmx2048m"
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
