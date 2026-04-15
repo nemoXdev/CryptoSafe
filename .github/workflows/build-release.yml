@@ -1,8 +1,8 @@
 name: Build Signed Release APK
 
 on:
-#  push:
-  #  branches: [ main ]
+ # push:
+   # branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -23,7 +23,15 @@ jobs:
 
       - name: Create Keystore in app folder
         run: |
-          keytool -genkey -v -keystore app/release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000 -storepass ${{ secrets.KEYSTORE_PASSWORD }} -keypass ${{ secrets.KEY_PASSWORD }} -dname "CN=CryptoSafe, OU=, O=, L=, S=, C="
+          keytool -genkey -v \
+            -keystore app/release.keystore \
+            -alias release \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -storepass "${{ secrets.KEYSTORE_PASSWORD }}" \
+            -keypass "${{ secrets.KEY_PASSWORD }}" \
+            -dname "CN=CryptoSafe, OU=Dev, O=CryptoSafe, L=City, S=State, C=US"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -33,9 +41,7 @@ jobs:
       - name: Build Release APK
         run: gradle assembleRelease
         env:
-          KEYSTORE_FILE: release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: release
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
           GRADLE_OPTS: "-Xmx2048m"
           JAVA_OPTS: "-Xmx2048m"
