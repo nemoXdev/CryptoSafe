@@ -3,7 +3,7 @@
     <!-- No internet permission. App runs 100% offline. -->
     <application
         android:allowBackup="false"
-        android:icon="@android:drawable/ic_lock_lock"
+        android:icon="@drawable/ic_launcher"
         android:label="CryptoSafe"
         android:supportsRtl="true"
         android:enableOnBackInvokedCallback="true"
