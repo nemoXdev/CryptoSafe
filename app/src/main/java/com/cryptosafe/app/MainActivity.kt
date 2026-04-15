@@ -123,9 +123,7 @@ fun CryptoSafeApp() {
                                     else
                                         CryptoEngine.decrypt(inputText, passChars)
 
-                                    // Clear password from memory after use
                                     passChars.fill('0')
-
                                     outputText = result
                                 } catch (e: Exception) {
                                     outputText = ""
@@ -224,7 +222,7 @@ fun InputFields(
         keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password)
     )
 
-    // Strength Indicator
+    // Strength Indicator - تم إصلاحه باستخدام Row وليس align
     val color = when (strength.first) {
         0, 1 -> androidx.compose.ui.graphics.Color(0xFFEF4444)
         2, 3 -> androidx.compose.ui.graphics.Color(0xFFF59E0B)
@@ -235,12 +233,16 @@ fun InputFields(
         modifier = Modifier.fillMaxWidth(),
         color = color
     )
-    Text(
-        strength.second,
-        modifier = Modifier.align(Alignment.End),
-        color = color,
-        style = MaterialTheme.typography.labelSmall
-    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Text(
+            strength.second,
+            color = color,
+            style = MaterialTheme.typography.labelSmall
+        )
+    }
 
     OutlinedTextField(
         value = inputText,
