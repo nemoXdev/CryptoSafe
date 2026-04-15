@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CryptoSafeApp() {
-    var mode by remember { mutableStateOf("encrypt") }
+    var mode by remember { mutableStateOf("home") }
     var password by remember { mutableStateOf("") }
     var inputText by remember { mutableStateOf("") }
     var outputText by remember { mutableStateOf("") }
@@ -54,15 +54,28 @@ fun CryptoSafeApp() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    val strength = remember(password) { CryptoEngine.checkPasswordStrength(password) }
+    val strength = remember(password) {
+        CryptoEngine.checkPasswordStrength(password.toCharArray())
+    }
+    val isPasswordWeak = strength.first <= 1
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (mode == "encrypt") "🔒 Encrypt / تشفير" else "🔓 Decrypt / فك التشفير") },
+                title = {
+                    Text(
+                        when (mode) {
+                            "encrypt" -> "🔒 Encrypt / تشفير"
+                            "decrypt" -> "🔓 Decrypt / فك التشفير"
+                            else -> "CryptoSafe"
+                        }
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = { mode = if (mode == "encrypt") "home" else "encrypt" }) {
-                        Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                    if (mode != "home") {
+                        IconButton(onClick = { mode = "home" }) {
+                            Icon(Icons.AutoMirrored.Default.ArrowBack, null)
+                        }
                     }
                 }
             )
@@ -74,55 +87,96 @@ fun CryptoSafeApp() {
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            if (mode == "home") {
-                HomeButtons(onEncrypt = { mode = "encrypt" }, onDecrypt = { mode = "decrypt" })
-            } else {
-                InputFields(password, inputText, showPassword, { password = it }, { inputText = it }, { showPassword = !showPassword }, strength)
-                
-                Button(
-                    onClick = {
-                        if (password.length < 10) return@Button Toast.makeText(context, "Password too short / كلمة المرور قصيرة", Toast.LENGTH_SHORT).show()
-                        if (inputText.isBlank()) return@Button Toast.makeText(context, "Enter text first / أدخل النص أولاً", Toast.LENGTH_SHORT).show()
-                        
-                        isLoading = true
-                        scope.launch(Dispatchers.IO) {
-                            try {
-                                val result = if (mode == "encrypt")
-                                    CryptoEngine.encrypt(inputText, password)
-                                else
-                                    CryptoEngine.decrypt(inputText, password)
-                                outputText = result
-                            } catch (e: Exception) {
-                                outputText = ""
-                                Toast.makeText(context, "Failed: Wrong password or corrupt data / فشل: كلمة مرور خاطئة أو نص تالف", Toast.LENGTH_LONG).show()
-                            } finally {
-                                isLoading = false
+            when (mode) {
+                "home" -> HomeButtons(
+                    onEncrypt = { mode = "encrypt" },
+                    onDecrypt = { mode = "decrypt" }
+                )
+                "encrypt", "decrypt" -> {
+                    InputFields(
+                        password = password,
+                        inputText = inputText,
+                        showPassword = showPassword,
+                        onPasswordChange = { password = it },
+                        onInputChange = { inputText = it },
+                        onTogglePassword = { showPassword = !showPassword },
+                        strength = strength
+                    )
+
+                    Button(
+                        onClick = {
+                            if (isPasswordWeak) {
+                                Toast.makeText(context, "Password too weak / كلمة المرور ضعيفة جداً", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+                            if (inputText.isBlank()) {
+                                Toast.makeText(context, "Enter text first / أدخل النص أولاً", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+
+                            isLoading = true
+                            scope.launch(Dispatchers.IO) {
+                                try {
+                                    val passChars = password.toCharArray()
+                                    val result = if (mode == "encrypt")
+                                        CryptoEngine.encrypt(inputText, passChars)
+                                    else
+                                        CryptoEngine.decrypt(inputText, passChars)
+
+                                    // Clear password from memory after use
+                                    passChars.fill('0')
+
+                                    outputText = result
+                                } catch (e: Exception) {
+                                    outputText = ""
+                                    Toast.makeText(context, "Failed: Wrong password or corrupt data / فشل: كلمة مرور خاطئة أو نص تالف", Toast.LENGTH_LONG).show()
+                                } finally {
+                                    isLoading = false
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().height(50.dp),
+                        enabled = !isLoading && !isPasswordWeak
+                    ) {
+                        if (isLoading) {
+                            CircularProgressIndicator(Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
+                        } else {
+                            Text(if (mode == "encrypt") "Encrypt / تشفير" else "Decrypt / فك التشفير")
+                        }
+                    }
+
+                    if (outputText.isNotEmpty()) {
+                        Spacer(Modifier.height(16.dp))
+                        Text("Output / المخرج:", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
+                        OutlinedTextField(
+                            value = outputText,
+                            onValueChange = {},
+                            readOnly = true,
+                            modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp, max = 200.dp),
+                            textStyle = TextStyle(fontSize = 13.sp, fontFamily = FontFamily.Monospace)
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    clipboard.setText(AnnotatedString(outputText))
+                                    Toast.makeText(context, "Copied / تم النسخ", Toast.LENGTH_SHORT).show()
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Copy / نسخ")
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    outputText = ""; inputText = ""; password = ""
+                                },
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text("Clear / مسح")
                             }
                         }
-                    },
-                    modifier = Modifier.fillMaxWidth().height(50.dp),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) CircularProgressIndicator(Modifier.size(20.dp), color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp)
-                    else Text(if (mode == "encrypt") "Encrypt / تشفير" else "Decrypt / فك التشفير")
-                }
-
-                if (outputText.isNotEmpty()) {
-                    Spacer(Modifier.height(16.dp))
-                    Text("Output / المخرج:", color = MaterialTheme.colorScheme.primary, style = MaterialTheme.typography.labelLarge)
-                    OutlinedTextField(
-                        value = outputText,
-                        onValueChange = {},
-                        readOnly = true,
-                        modifier = Modifier.fillMaxWidth().heightIn(min = 80.dp, max = 200.dp),
-                        textStyle = TextStyle(fontSize = 13.sp, fontFamily = FontFamily.Monospace)
-                    )
-                    Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Button(onClick = {
-                            clipboard.setText(AnnotatedString(outputText))
-                            Toast.makeText(context, "Copied / تم النسخ", Toast.LENGTH_SHORT).show()
-                        }, modifier = Modifier.weight(1f)) { Text("Copy / نسخ") }
-                        OutlinedButton(onClick = { outputText = ""; inputText = ""; password = "" }, modifier = Modifier.weight(1f)) { Text("Clear / مسح") }
                     }
                 }
             }
@@ -147,23 +201,50 @@ fun HomeButtons(onEncrypt: () -> Unit, onDecrypt: () -> Unit) {
 }
 
 @Composable
-fun InputFields(pass: String, text: String, showPass: Boolean, setPass: (String) -> Unit, setText: (String) -> Unit, togglePass: () -> Unit, strength: Pair<Int, String>) {
+fun InputFields(
+    password: String,
+    inputText: String,
+    showPassword: Boolean,
+    onPasswordChange: (String) -> Unit,
+    onInputChange: (String) -> Unit,
+    onTogglePassword: () -> Unit,
+    strength: Pair<Int, String>
+) {
     OutlinedTextField(
-        value = pass, onValueChange = setPass,
+        value = password,
+        onValueChange = onPasswordChange,
         label = { Text("Password / كلمة المرور") },
         modifier = Modifier.fillMaxWidth(),
-        visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
-        trailingIcon = { IconButton(onClick = togglePass) { Icon(if (showPass) Icons.Default.Visibility else Icons.Default.VisibilityOff, null) } },
+        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = onTogglePassword) {
+                Icon(if (showPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff, null)
+            }
+        },
         keyboardOptions = KeyboardOptions(keyboardType = androidx.compose.ui.text.input.KeyboardType.Password)
     )
-    
+
     // Strength Indicator
-    val color = when (strength.first) { 0, 1 -> androidx.compose.ui.graphics.Color(0xFFEF4444) 2, 3 -> androidx.compose.ui.graphics.Color(0xFFF59E0B) else -> androidx.compose.ui.graphics.Color(0xFF10B981) }
-    LinearProgressIndicator(progress = strength.first / 4f, modifier = Modifier.fillMaxWidth(), color = color)
-    Text(strength.second, modifier = Modifier.align(Alignment.End), color = color, style = MaterialTheme.typography.labelSmall)
+    val color = when (strength.first) {
+        0, 1 -> androidx.compose.ui.graphics.Color(0xFFEF4444)
+        2, 3 -> androidx.compose.ui.graphics.Color(0xFFF59E0B)
+        else -> androidx.compose.ui.graphics.Color(0xFF10B981)
+    }
+    LinearProgressIndicator(
+        progress = { strength.first / 4f },
+        modifier = Modifier.fillMaxWidth(),
+        color = color
+    )
+    Text(
+        strength.second,
+        modifier = Modifier.align(Alignment.End),
+        color = color,
+        style = MaterialTheme.typography.labelSmall
+    )
 
     OutlinedTextField(
-        value = text, onValueChange = setText,
+        value = inputText,
+        onValueChange = onInputChange,
         label = { Text("Input Text / أدخل النص") },
         modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp, max = 200.dp),
         maxLines = 10
