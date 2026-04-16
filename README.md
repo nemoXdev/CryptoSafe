@@ -80,7 +80,7 @@ The APK will be located at `app/build/outputs/apk/release/`.
 
 ## 📦 Download
 
-Get the latest stable APK from the [Releases](https://github.com/iejdudbd7/CryptoSafe/releases) page.
+Get the latest stable APK from the [Releases](https://github.com/nemoXdev/CryptoSafe/releases) page.
 
 - **Current Version**: v1.0.1
 - **Size**: ~4 MB
@@ -112,10 +112,10 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ## 👨‍💻 Developer
 
-CryptoSafe is maintained by [Nemo](https://github.com/iejdudbd7).
+CryptoSafe is maintained by [Nemo](https://github.com/nemoXdev).
 
 
-- 🐙 GitHub: [@iejdudbd7](https://github.com/iejdudbd7)
+- 🐙 GitHub: [@iejdudbd7](https://github.com/nemoXdev)
 
 Contributions, issues, and feature requests are welcome!
 
@@ -175,7 +175,7 @@ cd CryptoSafe
 
 #### 📦 تحميل
 
-احصل على أحدث نسخة مستقرة من صفحة [Releases](https://github.com/iejdudbd7/CryptoSafe/releases).
+احصل على أحدث نسخة مستقرة من صفحة [Releases](https://github.com/nemoXdev/CryptoSafe/releases).
 - **الإصدار الحالي**: v1.0.1
 - **الحجم**: ~4 MB
 - **بصمة SHA‑256**: (مرفقة مع ملفات الإصدار)
@@ -200,8 +200,8 @@ cd CryptoSafe
 
 #### 👨‍💻 المطور
 
-CryptoSafe يصونه [Nemo](https://github.com/iejdudbd7).
-- 🐙 GitHub: [@iejdudbd7](https://github.com/iejdudbd7)
+CryptoSafe يصونه [Nemo](https://github.com/nemoXdev).
+- 🐙 GitHub: [@nemoXdev](https://github.com/nemoXdev)
 
 المساهمات والاقتراحات والتبليغ عن المشكلات مرحب بها!
 
