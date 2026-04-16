@@ -68,7 +68,7 @@
 
 ### Local Build
 ```bash
-git clone https://github.com/iejdudbd7/CryptoSafe.git
+git clone https://github.com/nemoXdev/CryptoSafe.git
 cd CryptoSafe
 ./gradlew assembleRelease
 ```
