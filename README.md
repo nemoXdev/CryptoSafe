@@ -17,7 +17,7 @@
 - [📦 Download](#-download)
 - [🔒 Security & Privacy](#-security--privacy)
 - [📄 License](#-license)
-- [👨‍💻 Developer](#developer)
+- [👨‍💻 Developer](#dev-section)
 - [🇸🇦 Arabic](#-arabic)
 
 ---
@@ -94,7 +94,7 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 
 ---
 
-## Developer 👨‍💻
+## <a id="dev-section"></a>👨‍💻 Developer
 
 CryptoSafe is maintained by [Nemo](https://github.com/nemoXdev).
 
