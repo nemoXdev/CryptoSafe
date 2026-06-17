@@ -1,0 +1,5 @@
+• Upgraded key derivation to Argon2id (AES-256-GCM + Argon2id)
+• Added 8 new languages (10 languages total)
+• Language selection now saves persistently and detects device language
+• UI now updates immediately when switching languages
+• Bug fixes and improvements

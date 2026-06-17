@@ -1,0 +1,4 @@
+• Actualización a Argon2id para derivación de clave
+• Añadidos 8 nuevos idiomas (10 idiomas en total)
+• La selección de idioma ahora se guarda
+• Correcciones y mejoras

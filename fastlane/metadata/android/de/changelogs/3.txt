@@ -1,0 +1,4 @@
+• Umstellung auf Argon2id für Schlüsselableitung
+• 8 neue Sprachen hinzugefügt (insgesamt 10 Sprachen)
+• Sprachauswahl wird jetzt gespeichert
+• Fehlerkorrekturen und Verbesserungen

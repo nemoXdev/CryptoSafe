@@ -1,0 +1,1 @@
+Criptografia de texto AES-256 militar offline
