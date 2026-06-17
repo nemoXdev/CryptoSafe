@@ -11,14 +11,14 @@
 ---
 
 ## 📖 Table of Contents
-- [✨ Features](#features)
-- [🛠️ Tech Stack](#tech-stack)
-- [🚀 How to Build](#how-to-build)
-- [📦 Download](#download)
-- [🔒 Security & Privacy](#security--privacy)
-- [📄 License](#license)
-- [👨‍💻 Developer](#developer)
-- [🇸🇦 Arabic](#arabic)
+- [✨ Features](#-features)
+- [🛠️ Tech Stack](#️-tech-stack)
+- [🚀 How to Build](#-how-to-build)
+- [📦 Download](#-download)
+- [🔒 Security & Privacy](#-security--privacy)
+- [📄 License](#-license)
+- [👨‍💻 Developer](#-developer)
+- [🇸🇦 Arabic](#-arabic)
 
 ---
 
