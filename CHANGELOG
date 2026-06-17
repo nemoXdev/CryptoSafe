@@ -1,11 +1,11 @@
 # Changelog
 
-## [1.2.0] - 2025-06-17
+## [1.2.0] - 2026-06-17
 
 ### Changed
 - Performance improvements
 
-## [1.1.0] - 2025-05-01
+## [1.1.0] - 2026-05-01
 
 ### Fixed
 - Security vulnerabilities in password handling
@@ -14,7 +14,7 @@
 ### Changed
 - Performance and stability improvements
 
-## [1.0.1] - 2025-04-15
+## [1.0.1] - 2026-04-15
 
 ### Fixed
 - Crash on wrong password input
@@ -24,7 +24,7 @@
 - Screenshot protection (FLAG_SECURE)
 - About screen with usage guide
 
-## [1.0.0] - 2025-04-01
+## [1.0.0] - 2026-04-01
 
 ### Added
 - Initial release
