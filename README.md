@@ -71,7 +71,7 @@ The APK will be located at `app/build/outputs/apk/release/`.
 Get the latest stable APK from the [Releases](https://github.com/nemoXdev/CryptoSafe/releases) page.
 
 - **Current Version**: v1.2.0
-- **Size**: ~4 MB
+- **Size**: ~1.64 MB
 - **SHA‑256**: (provided in release assets)
 
 ---
