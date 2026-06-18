@@ -1,4 +1,9 @@
-# 🔐 CryptoSafe
+#  CryptoSafe
+<div align="left">
+  <img src="art/icon.png" width="96" height="96">
+  <br><br>
+  <img src="art/screen.jpg" width="300">
+</div>
 
 *A lightweight, offline-first Android app for military-grade text encryption.*
 
