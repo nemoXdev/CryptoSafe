@@ -7,7 +7,7 @@
 
 *A lightweight, offline-first Android app for military-grade text encryption.*
 
-[![GitHub release](https://img.shields.io/badge/release-v1.2.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.2.1-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-green)](https://android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)](https://kotlinlang.org)
@@ -70,7 +70,7 @@ The APK will be located at `app/build/outputs/apk/release/`.
 
 Get the latest stable APK from the [Releases](https://github.com/nemoXdev/CryptoSafe/releases) page.
 
-- **Current Version**: v1.2.0
+- **Current Version**: v1.2.1
 - **Size**: ~1.64 MB
 - **SHA‑256**: (provided in release assets)
 
