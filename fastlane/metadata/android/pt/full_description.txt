@@ -1,0 +1,9 @@
+CryptoSafe é um aplicativo Android leve e offline para criptografia de texto de nível militar. Seus dados nunca saem do seu dispositivo.
+
+Recursos:
+• Criptografia forte: AES-256-GCM com derivação de chave Argon2id (128 MiB, 4 iterações)
+• 100% offline: sem permissão de Internet necessária
+• Captura de tela bloqueada: FLAG_SECURE impede vazamentos
+• Zero armazenamento: sem logs, cache ou banco de dados
+• Interface moderna: Material 3 com tema escuro
+• Copiar e limpar com um toque
