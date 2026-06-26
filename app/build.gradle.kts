@@ -108,4 +108,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("com.lambdapioneer.argon2kt:argon2kt:1.6.0")
+
+    configurations.all {
+        exclude(group = "io.opencensus")
+    }
 }

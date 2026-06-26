@@ -843,7 +843,7 @@ fun AboutScreen() {
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    LocalizationManager.getString("version") + " 1.2.0",
+                    LocalizationManager.getString("version") + " " + BuildConfig.VERSION_NAME,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
