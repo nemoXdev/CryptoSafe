@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     companion object {
         // Set to false to temporarily disable screenshot protection
-        private const val ENABLE_SCREENSHOT_PROTECTION = false
+        private const val ENABLE_SCREENSHOT_PROTECTION = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
