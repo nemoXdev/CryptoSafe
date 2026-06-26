@@ -2,7 +2,7 @@
 <div align="left">
   <img src="art/icon.png" width="96" height="96">
   <br><br>
-  <img src="art/screen.jpg" width="300">
+  <img src="art/a310e3fd-2b74-4bbc-b3fc-adf1db4c7482.jpg" width="300">
 </div>
 
 *A lightweight, offline-first Android app for military-grade text encryption.*
