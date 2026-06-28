@@ -1,27 +1,17 @@
 Categories:
   - Security
+
 License: MIT
 AuthorName: Nemo
-AuthorEmail: your.nemoxdev@proton.me
+AuthorEmail: nemoxdev@proton.me
 SourceCode: https://github.com/nemoXdev/CryptoSafe
 IssueTracker: https://github.com/nemoXdev/CryptoSafe/issues
 Changelog: https://github.com/nemoXdev/CryptoSafe/releases
 
-AutoName: CryptoSafe
-Description: |-
-  CryptoSafe is a lightweight, offline-first Android app for military-grade text
-  encryption. Your data never leaves your device.
-
-  Features:
-  * Strong Encryption: AES-256-GCM with Argon2id key derivation (128 MiB, 4 iterations)
-  * 100% Offline: No internet permission needed
-  * Screenshot Blocked: FLAG_SECURE prevents accidental leaks
-  * Zero Storage: No logs, no cache, no database
-  * Modern UI: Material 3 design with dark theme
-  
-
 RepoType: git
 Repo: https://github.com/nemoXdev/CryptoSafe.git
+
+AutoName: CryptoSafe
 
 Builds:
   - versionName: "1.2.1"
@@ -33,9 +23,8 @@ Builds:
     gradleprops:
       - CRYPTOSAFE_STORE_PASSWORD=
       - CRYPTOSAFE_KEY_PASSWORD=
-    scandelete:
-      - app/release.keystore
     output: app/build/outputs/apk/release/app-release.apk
+    
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
