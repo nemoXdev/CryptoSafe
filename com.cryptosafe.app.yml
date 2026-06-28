@@ -19,7 +19,7 @@ Builds:
     subdir: app
     gradle:
       - yes
-    output: app/build/outputs/apk/release/app-release.apk
+    output: build/outputs/apk/release/app-universal-release.apk
     gradleprops:
       - CRYPTOSAFE_STORE_PASSWORD=
       - CRYPTOSAFE_KEY_PASSWORD=
