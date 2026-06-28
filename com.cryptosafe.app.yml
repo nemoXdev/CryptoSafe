@@ -1,6 +1,5 @@
 Categories:
   - Security
-
 License: MIT
 AuthorName: Nemo
 AuthorEmail: nemoxdev@proton.me
@@ -8,15 +7,10 @@ SourceCode: https://github.com/nemoXdev/CryptoSafe
 IssueTracker: https://github.com/nemoXdev/CryptoSafe/issues
 Changelog: https://github.com/nemoXdev/CryptoSafe/releases
 
-<<<<<<< HEAD
 AutoName: CryptoSafe
 
-=======
->>>>>>> d857d6def4c467455108a8fe3507255e19fd0708
 RepoType: git
 Repo: https://github.com/nemoXdev/CryptoSafe.git
-
-AutoName: CryptoSafe
 
 Builds:
   - versionName: 1.2.1
@@ -24,18 +18,11 @@ Builds:
     commit: v1.2.1
     subdir: app
     gradle:
-      - assembleRelease
+      - yes
     output: app/build/outputs/apk/release/app-release.apk
     gradleprops:
       - CRYPTOSAFE_STORE_PASSWORD=
       - CRYPTOSAFE_KEY_PASSWORD=
-<<<<<<< HEAD
-    scandelete:
-      - app/release.keystore
-=======
-    output: app/build/outputs/apk/release/app-release.apk
-    
->>>>>>> d857d6def4c467455108a8fe3507255e19fd0708
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
