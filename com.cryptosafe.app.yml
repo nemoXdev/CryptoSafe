@@ -23,6 +23,10 @@ Builds:
     gradleprops:
       - CRYPTOSAFE_STORE_PASSWORD=
       - CRYPTOSAFE_KEY_PASSWORD=
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4f5987ff58b6b3aa9f86f236aad0fab793be3426
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
