@@ -90,6 +90,10 @@ android {
         buildConfig = true
         compose = true
     }
+
+    dependenciesInfo {
+        includeInApk = false
+    }
 }
 
 dependencies {
