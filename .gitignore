@@ -14,3 +14,5 @@ app/release.keystore
 app/build/
 /build_log.txt
 /screenshots
+nemo.md
+/com.cryptosafe.app.yml
