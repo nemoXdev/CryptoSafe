@@ -28,6 +28,11 @@ object LocalizationManager {
         loadLocale(context, "fa")
         loadLocale(context, "ku")
         loadLocale(context, "hi")
+        loadLocale(context, "tr")
+        loadLocale(context, "ru")
+        loadLocale(context, "id")
+        loadLocale(context, "ko")
+        loadLocale(context, "ja")
 
         val saved = prefs?.getString("locale", null)
         if (saved != null && translations.containsKey(saved)) {
@@ -76,6 +81,11 @@ object LocalizationManager {
         "fa" -> "فارسی"
         "ku" -> "کوردی"
         "hi" -> "हिन्दी"
+        "tr" -> "Türkçe"
+        "ru" -> "Русский"
+        "id" -> "Bahasa Indonesia"
+        "ko" -> "한국어"
+        "ja" -> "日本語"
         else -> code
     }
 }

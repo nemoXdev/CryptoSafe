@@ -1,0 +1,1 @@
+Enkripsi teks offline AES-256-GCM dengan Argon2id

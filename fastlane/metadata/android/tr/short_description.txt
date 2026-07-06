@@ -1,0 +1,1 @@
+Argon2id ile çevrimdışı AES-256-GCM metin şifreleme
