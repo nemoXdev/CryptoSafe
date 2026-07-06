@@ -35,7 +35,7 @@
 | 👁️ *Screenshot Blocked* | Prevents accidental leaks via screenshots or screen recording. |
 | 🧹 *Zero Storage* | No logs, no cache, no database. Inputs wiped from memory immediately. |
 | 🌓 *Modern UI* | Sleek Material 3 design with dark theme and smooth animations. |
-| 🌐 *10 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी. |
+| 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Italiano, Türkçe. |
 | 📋 *Copy & Clear* | One‑tap copy to clipboard and quick clear of sensitive fields. |
 
 ---
