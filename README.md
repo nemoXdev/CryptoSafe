@@ -67,13 +67,38 @@ The APK will be located at `app/build/outputs/apk/release/`.
 ---
 
 ## 📦 Download
+<a href="https://f-droid.org/packages/com.cryptosafe.app">
+	<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" height="75">
+</a>
 
-Get the latest stable APK from the [Releases](https://github.com/nemoXdev/CryptoSafe/releases) page.
+You can download CryptoSafe from [F-Droid](https://f-droid.org/packages/com.cryptosafe.app) or from the [Releases](https://github.com/nemoXdev/CryptoSafe/releases) section in this repository.
 
-- **Current Version**: v1.2.2
-- **Size**: ~2.35 MB
-- **SHA‑256**: (provided in release assets)
+PGP Signature Verification
 
+The APK checksums are signed with my PGP key, which is available on public keyservers:
+
+gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys B735DBF5C0A886A4
+
+Fingerprint: "4BCC F36B C56D F0E0 AEB5 C758 B735 DBF5 C0A8 86A4"
+Email: "nemoXdev <140950079+nemoXdev@users.noreply.github.com>"
+
+To verify the APK checksums, save the PGP-signed message to a file and run:
+
+gpg --verify <the file>
+
+Don't install any APK if the verification fails.
+
+If the signature is valid, compare the SHA256 checksums with:
+
+sha256sum <APK file>
+
+Don't install the APK if the checksums don't match.
+
+F-Droid
+
+APKs distributed by F-Droid are signed with the F-Droid signing key, not with my PGP key.
+
+The "AllowedAPKSigningKeys" field in the F-Droid metadata ensures that official F-Droid builds match my Android app signing certificate.
 ---
 
 ## 🔒 Security & Privacy
