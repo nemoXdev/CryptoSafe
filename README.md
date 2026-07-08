@@ -76,22 +76,23 @@ You can download CryptoSafe from [F-Droid](https://f-droid.org/packages/com.cryp
 PGP Signature Verification
 
 The APK checksums are signed with my PGP key, which is available on public keyservers:
-
+```
 gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys B735DBF5C0A886A4
-
+```
+```
 Fingerprint: "4BCC F36B C56D F0E0 AEB5 C758 B735 DBF5 C0A8 86A4"
 Email: nemoXdev <140950079+nemoXdev@users.noreply.github.com>
-
+```
 To verify the APK checksums, save the PGP-signed message to a file and run:
-
+```
 gpg --verify <the file>
-
+```
 Don't install any APK if the verification fails.
 
 If the signature is valid, compare the SHA256 checksums with:
-
+```
 sha256sum <APK file>
-
+```
 Don't install the APK if the checksums don't match.
 
 F-Droid
@@ -132,8 +133,6 @@ Contributions, issues, and feature requests are welcome!
 ---
 
 
-CryptoSafe يصونه [Nemo](https://github.com/nemoXdev).
-- 🐙 GitHub: [@nemoXdev](https://github.com/nemoXdev)
 
 المساهمات والاقتراحات والتبليغ عن المشكلات مرحب بها!
 
