@@ -10,6 +10,7 @@
   "encrypt_button": "加密",
   "decrypt_button": "解密",
   "password_strength": "密码强度",
+  "count": "数量",
   "weak": "弱",
   "medium": "中",
   "strong": "强",
@@ -29,12 +30,14 @@
   "source_code": "源代码",
   "version": "版本",
   "whats_new_title": "更新内容",
-  "whats_new_body": "版本 1.2.2：\n• 新增语言。",
+  "whats_new_body": "版本 1.3.0：\n• 新增随机密码生成器。\n• 修复长密码导致崩溃的问题。\n• 一般改进。",
   "how_to_use_title": "使用方法",
   "how_to_use": "• 输入强密码（10位以上）。\n• 输入要加密的文本或粘贴要解密的加密文本。\n• 点击加密/解密。\n• 复制结果并安全保存。",
   "disclaimer_title": "免责声明",
   "disclaimer_body": "本应用按'原样'提供，不提供任何担保。开发者不对任何数据丢失或安全漏洞负责。请务必将加密数据和密码备份在安全的地方。",
   "content_desc_back": "返回",
   "content_desc_language": "语言",
-  "content_desc_about": "关于"
+  "content_desc_about": "关于",
+  "generate_password": "生成密码",
+  "length": "长度"
 }

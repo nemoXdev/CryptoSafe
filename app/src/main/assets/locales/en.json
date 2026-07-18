@@ -10,6 +10,7 @@
   "encrypt_button": "Encrypt",
   "decrypt_button": "Decrypt",
   "password_strength": "Password Strength",
+  "count": "Count",
   "weak": "Weak",
   "medium": "Medium",
   "strong": "Strong",
@@ -29,12 +30,14 @@
   "source_code": "Source Code",
   "version": "Version",
   "whats_new_title": "What's New",
-  "whats_new_body": "Version 1.2.2:\n• New languages added.",
+  "whats_new_body": "Version 1.3.0:\n• Add random password generator.\n• Fix app crash with long passwords.\n• General improvements.",
   "how_to_use_title": "How to Use",
   "how_to_use": "• Enter a strong password (10+ chars).\n• Enter text to encrypt or paste encrypted text to decrypt.\n• Press Encrypt/Decrypt.\n• Copy the result and store it safely.",
   "disclaimer_title": "Disclaimer",
   "disclaimer_body": "This app is provided 'as is' without warranties. The developer is not responsible for any data loss or security breaches. Always keep backups of your encrypted data and passwords in a safe place.",
   "content_desc_back": "Back",
   "content_desc_language": "Language",
-  "content_desc_about": "About"
+  "content_desc_about": "About",
+  "generate_password": "Generate Password",
+  "length": "Length"
 }

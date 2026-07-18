@@ -1,0 +1,3 @@
+• Ajout du générateur de mots de passe aléatoires.
+• Correction du crash avec les mots de passe longs.
+• Améliorations générales.

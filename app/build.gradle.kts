@@ -14,8 +14,8 @@ android {
         applicationId = "com.cryptosafe.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.2.2"
+        versionCode = 7
+        versionName = "1.3.0"
     }
 
     signingConfigs {
@@ -112,6 +112,8 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     implementation("com.lambdapioneer.argon2kt:argon2kt:1.6.0")
+
+    testImplementation("junit:junit:4.13.2")
 
     configurations.all {
         exclude(group = "io.opencensus")

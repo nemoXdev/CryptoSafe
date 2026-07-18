@@ -7,7 +7,7 @@
 
 *A lightweight, offline-first Android app for military-grade text encryption.*
 
-[![GitHub release](https://img.shields.io/badge/release-v1.2.2-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
+[![GitHub release](https://img.shields.io/badge/release-v1.3.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-green)](https://android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)](https://kotlinlang.org)
@@ -35,8 +35,9 @@
 | 👁️ *Screenshot Blocked* | Prevents accidental leaks via screenshots or screen recording. |
 | 🧹 *Zero Storage* | No logs, no cache, no database. Inputs wiped from memory immediately. |
 | 🌓 *Modern UI* | Sleek Material 3 design with dark theme and smooth animations. |
-| 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Italiano, Türkçe. |
+| 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Bahasa Indonesia, Türkçe. |
 | 📋 *Copy & Clear* | One‑tap copy to clipboard and quick clear of sensitive fields. |
+| 🔑 *Password Generator* | Generate strong random passwords with customizable length. |
 
 ---
 
@@ -45,7 +46,7 @@
 - **Language**: Kotlin 2.1.0
 - **UI Toolkit**: Jetpack Compose (Material 3)
 - **Build System**: Gradle 8.13 (KTS)
-- **CI/CD**: Codemagic
+- **CI/CD**: GitHub Actions
 - **Key Derivation**: Argon2id (argon2kt)
 - **Min SDK**: Android 7.0 (API 24)
 - **Target SDK**: Android 15 (API 35)
@@ -129,12 +130,6 @@ This project is licensed under the MIT License – see the [LICENSE](LICENSE) fi
 CryptoSafe is maintained by [Nemo](https://github.com/nemoXdev).
 
 Contributions, issues, and feature requests are welcome!
-
----
-
-
-
-المساهمات والاقتراحات والتبليغ عن المشكلات مرحب بها!
 
 ---
 

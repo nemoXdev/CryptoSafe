@@ -1,0 +1,3 @@
+• Añadido generador de contraseñas aleatorias.
+• Corregido fallo con contraseñas largas.
+• Mejoras generales.

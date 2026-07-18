@@ -9,12 +9,12 @@ Copy the structure from `en.json` and translate all values.
 ### Step 2: Register the language in code
 Open `LocalizationManager.kt` and:
 
-**Add loading** (line ~22):
+**Add loading**:
 ```kotlin
 loadLocale(context, "de")
 ```
 
-**Add display name** (line ~63):
+**Add display name**:
 ```kotlin
 "de" -> "Deutsch"
 ```
@@ -27,14 +27,19 @@ That's it. The language menu, device detection, and persistence work automatical
 |------|----------|-------------|
 | `en` | English | English |
 | `ar` | Arabic | العربية |
-| `fr` | French | Français |
-| `es` | Spanish | Español |
 | `de` | German | Deutsch |
-| `zh` | Chinese (Simplified) | 简体中文 |
-| `pt` | Portuguese | Português |
+| `es` | Spanish | Español |
 | `fa` | Persian | فارسی |
-| `ku` | Kurdish (Sorani) | کوردی |
+| `fr` | French | Français |
 | `hi` | Hindi | हिन्दी |
+| `id` | Indonesian | Bahasa Indonesia |
+| `ja` | Japanese | 日本語 |
+| `ko` | Korean | 한국어 |
+| `ku` | Kurdish (Sorani) | کوردی |
+| `pt` | Portuguese | Português |
+| `ru` | Russian | Русский |
+| `tr` | Turkish | Türkçe |
+| `zh` | Chinese (Simplified) | 简体中文 |
 
 ## File Format
 
@@ -43,7 +48,6 @@ Each language file must be valid JSON with these keys:
 ```json
 {
   "app_name": "",
-  "home": "",
   "encrypt": "",
   "decrypt": "",
   "password": "",
@@ -54,35 +58,36 @@ Each language file must be valid JSON with these keys:
   "encrypt_button": "",
   "decrypt_button": "",
   "password_strength": "",
+  "count": "",
   "weak": "",
   "medium": "",
   "strong": "",
   "copied": "",
   "error": "",
   "success": "",
-  "language": "",
   "select_language": "",
   "offline_secure": "",
   "offline_desc": "",
   "input_label": "",
-  "encrypt_text": "",
-  "decrypt_text": "",
-  "enter_password": "",
-  "confirm_password": "",
   "output": "",
+  "password_required": "",
   "password_too_weak": "",
-  "passwords_dont_match": "",
+  "decrypt_error": "",
   "about": "",
-  "about_title": "",
   "developer": "",
+  "source_code": "",
   "version": "",
-  "description": "",
   "whats_new_title": "",
   "whats_new_body": "",
   "how_to_use_title": "",
   "how_to_use": "",
   "disclaimer_title": "",
-  "disclaimer_body": ""
+  "disclaimer_body": "",
+  "content_desc_back": "",
+  "content_desc_language": "",
+  "content_desc_about": "",
+  "generate_password": "",
+  "length": ""
 }
 ```
 

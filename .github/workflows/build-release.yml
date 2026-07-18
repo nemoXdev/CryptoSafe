@@ -33,6 +33,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Run lint
+        run: ./gradlew lint
+
+      - name: Run tests
+        run: ./gradlew testDebugUnitTest
+
       - name: Build Release APK
         env:
           CRYPTOSAFE_STORE_PASSWORD: ${{ secrets.CRYPTOSAFE_PASSWORD }}

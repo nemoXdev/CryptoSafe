@@ -10,6 +10,7 @@
   "encrypt_button": "Şifrele",
   "decrypt_button": "Şifreyi Çöz",
   "password_strength": "Şifre Gücü",
+  "count": "Sayı",
   "weak": "Zayıf",
   "medium": "Orta",
   "strong": "Güçlü",
@@ -29,12 +30,14 @@
   "source_code": "Kaynak Kodu",
   "version": "Sürüm",
   "whats_new_title": "Yenilikler",
-  "whats_new_body": "Sürüm 1.2.2:\n• Yeni diller eklendi.",
+  "whats_new_body": "Sürüm 1.3.0:\n• Rastgele şifre üreteci eklendi.\n• Uzun şifrelerle çökme düzeltildi.\n• Genel iyileştirmeler.",
   "how_to_use_title": "Nasıl Kullanılır",
   "how_to_use": "• Güçlü bir şifre girin (10+ karakter).\n• Şifrelemek için metin girin veya şifrelenmiş metni yapıştırın.\n• Şifrele/Şifreyi Çöz'e basın.\n• Sonucu kopyalayın ve güvenli bir yerde saklayın.",
   "disclaimer_title": "Sorumluluk Reddi",
   "disclaimer_body": "Bu uygulamagaranti olmaksızın 'olduğu gibi' sunulmaktadır. Geliştirici, veri kaybı veya güvenlik ihlallerinden sorumlu değildir. Şifrelenmiş verilerinizin ve şifrelerinizin her zaman yedeklerini güvenli bir yerde saklayın.",
   "content_desc_back": "Geri",
   "content_desc_language": "Dil",
-  "content_desc_about": "Hakkında"
+  "content_desc_about": "Hakkında",
+  "generate_password": "Şifre Oluştur",
+  "length": "Uzunluk"
 }

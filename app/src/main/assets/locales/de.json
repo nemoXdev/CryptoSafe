@@ -10,6 +10,7 @@
   "encrypt_button": "Verschlüsseln",
   "decrypt_button": "Entschlüsseln",
   "password_strength": "Passwortstärke",
+  "count": "Anzahl",
   "weak": "Schwach",
   "medium": "Mittel",
   "strong": "Stark",
@@ -29,12 +30,14 @@
   "source_code": "Quellcode",
   "version": "Version",
   "whats_new_title": "Neuigkeiten",
-  "whats_new_body": "Version 1.2.2:\n• Neue Sprachen hinzugefügt.",
+  "whats_new_body": "Version 1.3.0:\n• Zufälliges Passwortgenerator hinzugefügt.\n• Absturz mit langen Passwörtern behoben.\n• Allgemeine Verbesserungen.",
   "how_to_use_title": "Bedienungsanleitung",
   "how_to_use": "• Geben Sie ein starkes Passwort ein (10+ Zeichen).\n• Geben Sie zu verschlüsselnden Text ein oder fügen Sie verschlüsselten Text zum Entschlüsseln ein.\n• Drücken Sie Verschlüsseln/Entschlüsseln.\n• Kopieren Sie das Ergebnis und bewahren Sie es sicher auf.",
   "disclaimer_title": "Haftungsausschluss",
   "disclaimer_body": "Diese App wird 'wie besehen' ohne Gewährleistung bereitgestellt. Der Entwickler haftet nicht für Datenverlust oder Sicherheitsverletzungen. Bewahren Sie stets Sicherungskopien Ihrer verschlüsselten Daten und Passwörter an einem sicheren Ort auf.",
   "content_desc_back": "Zurück",
   "content_desc_language": "Sprache",
-  "content_desc_about": "Über"
+  "content_desc_about": "Über",
+  "generate_password": "Passwort generieren",
+  "length": "Länge"
 }

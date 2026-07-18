@@ -1,0 +1,3 @@
+• Adicionado gerador de senhas aleatórias.
+• Corrigido travamento com senhas longas.
+• Melhorias gerais.

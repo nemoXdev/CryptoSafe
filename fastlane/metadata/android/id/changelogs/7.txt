@@ -1,0 +1,3 @@
+• Penambahan pembuat kata sandi acak.
+• Perbaikan crash dengan kata sandi panjang.
+• Peningkatan umum.

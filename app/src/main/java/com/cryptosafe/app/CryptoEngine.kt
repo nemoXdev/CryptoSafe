@@ -2,6 +2,8 @@ package com.cryptosafe.app
 
 import com.lambdapioneer.argon2kt.Argon2Kt
 import com.lambdapioneer.argon2kt.Argon2Mode
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
 import java.security.SecureRandom
 import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
@@ -46,7 +48,13 @@ object CryptoEngine {
     }
 
     private fun deriveKey(password: CharArray, salt: ByteArray): ByteArray {
-        val passwordBytes = password.concatToString().toByteArray(Charsets.UTF_8)
+        val charBuffer = CharBuffer.wrap(password)
+        val byteBuffer = Charsets.UTF_8.newEncoder().encode(charBuffer)
+        val passwordBytes = ByteArray(byteBuffer.remaining())
+        byteBuffer.get(passwordBytes)
+        byteBuffer.clear()
+        charBuffer.clear()
+
         val result = argon2.hash(
             mode = Argon2Mode.ARGON2_ID,
             password = passwordBytes,
@@ -60,18 +68,37 @@ object CryptoEngine {
         return result.rawHashAsByteArray()
     }
 
-    fun checkPasswordStrength(password: CharArray): Pair<Int, String> {
-        var score = 0
-        if (password.size >= 10) score++
-        if (password.any { it.isLetter() }) score++
-        if (password.any { it.isDigit() }) score++
-        if (password.any { !it.isLetterOrDigit() }) score++
+    fun generatePassword(length: Int = 16): String {
+        val upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        val lower = "abcdefghijklmnopqrstuvwxyz"
+        val digits = "0123456789"
+        val symbols = "!@#\$%^&*()-_=+"
+        val random = SecureRandom()
+        val perType = length / 4
+        val remainder = length % 4
+        val result = mutableListOf<Char>()
+        repeat(perType + if (remainder > 0) 1 else 0) { result.add(upper[random.nextInt(upper.length)]) }
+        repeat(perType + if (remainder > 1) 1 else 0) { result.add(lower[random.nextInt(lower.length)]) }
+        repeat(perType + if (remainder > 2) 1 else 0) { result.add(digits[random.nextInt(digits.length)]) }
+        repeat(perType) { result.add(symbols[random.nextInt(symbols.length)]) }
+        result.shuffle(random)
+        return result.joinToString("")
+    }
 
-        val levelKey = when (score) {
-            0, 1 -> "weak"
-            2, 3 -> "medium"
-            4 -> "strong"
-            else -> "weak"
+    fun checkPasswordStrength(password: CharArray): Pair<Int, String> {
+        val length = password.size
+        val str = String(password)
+        val hasUpper = str.any { it.isUpperCase() }
+        val hasLower = str.any { it.isLowerCase() }
+        val hasDigit = str.any { it.isDigit() }
+        val hasSymbol = str.any { !it.isLetterOrDigit() }
+        val hasAll = hasUpper && hasLower && hasDigit && hasSymbol
+
+        val (score, levelKey) = when {
+            length <= 8 -> 1 to "weak"
+            length <= 15 && hasAll -> 2 to "medium"
+            length > 15 && hasAll -> 4 to "strong"
+            else -> 1 to "weak"
         }
         return Pair(score, levelKey)
     }

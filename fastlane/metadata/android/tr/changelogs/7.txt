@@ -1,0 +1,3 @@
+• Rastgele şifre üreteci eklendi.
+• Uzun şifrelerle çökme düzeltildi.
+• Genel iyileştirmeler.
