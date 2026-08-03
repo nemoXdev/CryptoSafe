@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.cryptosafe.app.components.PasswordDialog
+import com.cryptosafe.app.components.RandomNameButton
 import com.cryptosafe.app.components.SafePasswordField
 import com.cryptosafe.app.components.FlatDialog
 import androidx.compose.material3.Button
@@ -71,7 +72,8 @@ fun BoxSettingsScreen(
     box: Box,
     database: AppDatabase,
     onBack: () -> Unit,
-    onPasswordChanged: () -> Unit = {}
+    onPasswordChanged: () -> Unit = {},
+    boxSessionCache: Map<Long, Pair<String, Long>> = emptyMap()
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -128,7 +130,10 @@ fun BoxSettingsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     shape = MaterialTheme.shapes.small,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
+                    trailingIcon = {
+                        RandomNameButton(onClick = { boxName = randomBoxName() })
+                    }
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -243,6 +248,14 @@ fun BoxSettingsScreen(
                 fun persistLockMode(mode: String, minutes: Int?) {
                     if (mode != "permanent" && box.lockMode == "permanent") {
                         SecurePasswordStorage.removeBoxPassword(box.id)
+                    }
+                    // عند التبديل إلى "دائم": إن كانت كلمة المرور في ذاكرة الجلسة (سبق فتح الصندوق
+                    // هذه الجلسة) تُحفظ فوراً في التخزين المشفّر بدل انتظار أول فتح ناجح.
+                    if (mode == "permanent") {
+                        val cachedPw = boxSessionCache[box.id]?.first
+                        if (cachedPw != null) {
+                            SecurePasswordStorage.saveBoxPassword(box.id, cachedPw)
+                        }
                     }
                     scope.launch(Dispatchers.IO) {
                         database.boxDao().updateBox(box.copy(lockMode = mode, lockTimeoutMinutes = minutes))

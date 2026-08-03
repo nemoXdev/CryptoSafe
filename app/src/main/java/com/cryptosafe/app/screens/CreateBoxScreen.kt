@@ -45,10 +45,36 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
+import com.cryptosafe.app.components.RandomNameButton
 import com.cryptosafe.app.data.AppDatabase
 import com.cryptosafe.app.data.Box
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+
+internal val boxNameAdjectives = listOf(
+    "silent", "golden", "brave", "clever", "calm", "swift", "quiet", "noble",
+    "bright", "crimson", "gentle", "wise", "lucky", "bold", "crystal", "deep",
+    "eager", "fair", "free", "graceful", "hidden", "ivory", "jolly", "keen",
+    "lively", "mellow", "misty", "neat", "oceanic", "peaceful", "quaint",
+    "radiant", "serene", "silver", "tender", "velvet", "warm", "witty", "zen"
+)
+
+internal val boxNameNouns = listOf(
+    "lotus", "falcon", "otter", "tiger", "eagle", "wolf", "panda", "fox",
+    "badger", "sparrow", "dolphin", "turtle", "panther", "raccoon", "whale",
+    "alpaca", "beaver", "coyote", "dragon", "elk", "finch", "gazelle", "heron",
+    "ibis", "jaguar", "koala", "lemur", "marten", "narwhal", "ocelot", "puffin",
+    "quokka", "raven", "salamander", "tarantula", "urchin", "vixen", "wombat",
+    "yak", "zebra", "harbor", "meadow", "river", "forest", "mountain", "pebble",
+    "willow", "sprout", "comet", "nebula"
+)
+
+internal fun randomBoxName(): String {
+    val random = kotlin.random.Random
+    val adjective = boxNameAdjectives[random.nextInt(boxNameAdjectives.size)]
+    val noun = boxNameNouns[random.nextInt(boxNameNouns.size)]
+    return "$adjective-$noun"
+}
 
 @Composable
 fun CreateBoxScreen(
@@ -114,7 +140,10 @@ fun CreateBoxScreen(
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             shape = MaterialTheme.shapes.small,
-            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary)
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = MaterialTheme.colorScheme.primary),
+            trailingIcon = {
+                RandomNameButton(onClick = { boxName = randomBoxName() })
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
