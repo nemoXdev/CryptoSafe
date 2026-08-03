@@ -1,11 +1,15 @@
-CryptoSafe, çevrimdışı çalışan hafif bir Android uygulamasıdır ve askeri düzeyde metin şifreleme sağlar. Verileriniz asla cihazınızdan çıkmaz.
+CryptoSafe, Anonim Şifreli Kutularla askeri düzeyde metin şifrelemeye yönelik hafif, çevrimdışı öncelikli bir Android uygulamasıdır. Verileriniz cihazınızdan asla ayrılmaz.
 
 Özellikler:
-• Güçlü Şifreleme: AES-256-GCM ve Argon2id anahtar türetme (128 MiB, 4 döngü)
-• %100 Çevrimdışı: İnternet izni gerekmez. Verileriniz asla cihazınızdan çıkmaz
-• Ekran Görüntüsü Engelleme: FLAG_SECURE kazara sızıntıları önler
-• Sıfır Depolama: Günlük yok, önbellek yok, veritabanı yok
-• Modern Arayüz: Material 3 tasarım, koyu tema ve akıcı animasyonlar
-• Kopyala ve Temizle: Tek dokunuşla kopyalama ve hassas alanları hızlı temizleme
+• Güçlü Şifreleme: Argon2id anahtar türetme ile AES-256-GCM (128 MiB, 4 yineleme)
+• Şifreli Kutular: Kutu başına şifreler içeren, şifre korumalı kutulardaki konuşmaları düzenleyin
+• Uygulama Kilidi: Otomatik kilitleme zamanlayıcısı ile PIN ve Biyometrik (parmak izi) kilidini açma
+• Şifreli Veritabanı: SQLCipher şifreli veritabanında saklanan tüm veriler
+• %100 Çevrimdışı: İnternet izni gerekmez
+• Box'ta Paylaş: WhatsApp, Telegram ve diğer uygulamalardan paylaşılan metni alın
+• Mesajları Otomatik Sil: Mesajları 1 saatten 90 güne kadar otomatik olarak silinecek şekilde ayarlayın
+• Ekran Görüntüsü Koruması: FLAG_SECURE kazara yapılan sızıntıları önler
+• Şifre Oluşturucu: Yerleşik rastgele şifre oluşturucu
+• Modern kullanıcı arayüzü: Koyu temalı Materyal 3 tasarımı
 
-Gazeteciler, aktivistler ve bulut hizmetlerine veya internet bağlantısına ihtiyaç duymadan hassas metin mesajlarını şifrelemesi gereken herkes için mükemmeldir.
+

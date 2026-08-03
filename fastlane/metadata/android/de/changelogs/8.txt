@@ -1,0 +1,9 @@
+Version 2.0.0:
+• Verschlüsselte Boxen (Chat) mit Passwörtern pro Box
+• App-Sperre mit PIN und biometrischer Entsperrung
+• Verschlüsselte Datenbank (SQLCipher)
+• Teilen Sie Absichten aus anderen Apps
+• Nachrichten automatisch löschen (1 Stunde bis 90 Tage)
+• Einstellungsbildschirm
+• Hilfe- und Anleitungsbildschirm mit ausführlicher Dokumentation
+• Allgemeine Verbesserungen und Fehlerbehebungen

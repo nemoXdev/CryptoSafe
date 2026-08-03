@@ -1,0 +1,9 @@
+Versão 2.0.0:
+• Caixas criptografadas (bate-papo) com senhas por caixa
+• Bloqueio de aplicativo com PIN e desbloqueio biométrico
+• Banco de dados criptografado (SQLCipher)
+• Compartilhe intenções de outros aplicativos
+• Exclusão automática de mensagens (1h a 90 dias)
+• Tela de configurações
+• Tela de Ajuda e Guia com documentação detalhada
+• Melhorias gerais e correções de bugs

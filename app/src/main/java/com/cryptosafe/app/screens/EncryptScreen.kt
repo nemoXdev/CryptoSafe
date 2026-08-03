@@ -1,21 +1,21 @@
 package com.cryptosafe.app.screens
 
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -48,6 +49,7 @@ import com.cryptosafe.app.components.OutputCard
 import com.cryptosafe.app.components.PasswordStrengthCard
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun HomeButtons(onEncrypt: () -> Unit, onDecrypt: () -> Unit) {
@@ -84,7 +86,7 @@ fun HomeButtons(onEncrypt: () -> Unit, onDecrypt: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Icon(Icons.Default.Lock, null, modifier = Modifier.size(24.dp))
@@ -97,7 +99,7 @@ fun HomeButtons(onEncrypt: () -> Unit, onDecrypt: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp),
-                shape = RoundedCornerShape(16.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
             ) {
                 Icon(Icons.Default.LockOpen, null, modifier = Modifier.size(24.dp))
@@ -127,7 +129,7 @@ fun EncryptScreen(
     val scope = rememberCoroutineScope()
     val clipboard = LocalClipboardManager.current
 
-    val strength = remember(password) {
+    val strength = remember(password.contentHashCode()) {
         CryptoEngine.checkPasswordStrength(password)
     }
 
@@ -153,30 +155,29 @@ fun EncryptScreen(
                 }
 
                 onStartLoading()
-                scope.launch(Dispatchers.IO) {
+                scope.launch {
                     val passChars = password.clone()
                     try {
-                        val result = CryptoEngine.encrypt(inputText, passChars)
+                        val result = withContext(Dispatchers.IO) {
+                            CryptoEngine.encrypt(inputText, passChars)
+                        }
                         onOutputChange(result)
                         onPasswordChange(charArrayOf())
-                        scope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, LocalizationManager.getString("success"), Toast.LENGTH_SHORT).show()
-                        }
+                        onFinishLoading()
+                        Toast.makeText(context, LocalizationManager.getString("success"), Toast.LENGTH_SHORT).show()
                     } catch (e: Exception) {
                         onOutputChange("")
-                        scope.launch(Dispatchers.Main) {
-                            Toast.makeText(context, LocalizationManager.getString("error"), Toast.LENGTH_LONG).show()
-                        }
+                        onFinishLoading()
+                        Toast.makeText(context, LocalizationManager.getString("error"), Toast.LENGTH_LONG).show()
                     } finally {
                         passChars.fill('\u0000')
-                        onFinishLoading()
                     }
                 }
             },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = MaterialTheme.shapes.small,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             enabled = !isLoading && password.isNotEmpty() && password.size < 1000
         ) {
@@ -196,13 +197,23 @@ fun EncryptScreen(
                     clipboard.setText(AnnotatedString(outputText))
                     Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
                 },
+                onShare = {
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, outputText)
+                    }
+                    context.startActivity(Intent.createChooser(shareIntent, null))
+                },
                 onClear = onClear
             )
         }
     }
 
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val isExpanded = maxWidth >= 840.dp
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp.dp
+
+    Box(modifier = Modifier.fillMaxSize().imePadding()) {
+        val isExpanded = screenWidthDp >= 840.dp
         if (isExpanded) {
             Row(
                 modifier = Modifier

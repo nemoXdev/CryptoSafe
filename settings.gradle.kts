@@ -11,6 +11,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // SQLCipher متاح على Maven Central عبر sqlcipher-android
     }
 }
 

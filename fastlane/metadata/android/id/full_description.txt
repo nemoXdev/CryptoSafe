@@ -1,11 +1,15 @@
-CryptoSafe adalah aplikasi Android ringan yang berfungsi offline untuk enkripsi teks kelas militer. Data Anda tidak pernah meninggalkan perangkat Anda.
+CryptoSafe adalah aplikasi Android ringan dan offline untuk enkripsi teks tingkat militer dengan Kotak Terenkripsi Anonim. Data Anda tidak akan pernah meninggalkan perangkat Anda.
 
 Fitur:
-• Enkripsi Kuat: AES-256-GCM dengan turunan kunci Argon2id (128 MiB, 4 iterasi)
-• 100% Offline: Tidak memerlukan izin internet. Data Anda tidak pernah meninggalkan perangkat
-• Blokir Tangkapan Layar: FLAG_SECURE mencegah kebocoran yang tidak disengaja
-• Penyimpanan Nol: Tanpa log, tanpa cache, tanpa basis data
-• Antarmuka Modern: Desain Material 3 dengan tema gelap dan animasi yang halus
-• Salin dan Hapus: Salin sekali ketuk dan hapus cepat bidang sensitif
+• Enkripsi Kuat: AES-256-GCM dengan derivasi kunci Argon2id (128 MiB, 4 iterasi)
+• Kotak Terenkripsi: Atur percakapan dalam kotak yang dilindungi kata sandi dengan kata sandi per kotak
+• Kunci Aplikasi: PIN dan Biometrik (sidik jari) terbuka dengan pengatur waktu kunci otomatis
+• Database Terenkripsi: Semua data disimpan dalam database terenkripsi SQLCipher
+• 100% Offline: Tidak diperlukan izin internet
+• Bagikan ke Kotak: Terima teks yang dibagikan dari WhatsApp, Telegram, dan aplikasi lainnya
+• Hapus Otomatis Pesan: Mengatur pesan agar dihapus otomatis setelah 1 jam hingga 90 hari
+• Perlindungan Tangkapan Layar: FLAG_SECURE mencegah kebocoran yang tidak disengaja
+• Pembuat Kata Sandi: Pembuat kata sandi acak bawaan
+• UI Modern: Desain Material 3 dengan tema gelap
 
-Sempurna untuk jurnalis, aktivis, dan siapa saja yang perlu mengenkripsi pesan teks sensitif tanpa mengandalkan layanan cloud atau koneksi internet.
+

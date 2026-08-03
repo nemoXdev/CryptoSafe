@@ -1,0 +1,9 @@
+Version 2.0.0:
+• Encrypted Boxes (Chat) with per-box passwords
+• App Lock with PIN and Biometric unlock
+• Encrypted database (SQLCipher)
+• Share intent from other apps
+• Auto-delete messages (1h to 90 days)
+• Settings screen
+• Help & Guide screen with detailed documentation
+• General improvements and bug fixes

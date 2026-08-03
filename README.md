@@ -1,13 +1,47 @@
-#  CryptoSafe
+# CryptoSafe
+
+Your support means a lot! If you find CryptoSafe useful, please:
+
+<p align="left">
+  <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" width="48" height="48" alt="Bitcoin">
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/ltc.png" width="48" height="48" alt="Litecoin">
+  <br>
+	
+  <b>BTC:</b> <code>bc1qwvywjftxp9v984d5leqezq2e5kyqkkk5dw2wz9</code>
+  <br>
+  
+  <b>LTC:</b> <code>ltc1qjdql8jfhs7prt44a9thgh7rvmmm0jnx8cumd7a</code>
+</p>
+
+<br>
+
+---
+
+# *A lightweight, offline-first Android app for military-grade text encryption.*
 <div align="left">
   <img src="art/icon.png" width="96" height="96">
-  <br><br>
-  <img src="art/a310e3fd-2b74-4bbc-b3fc-adf1db4c7482.jpg" width="300">
 </div>
 
-*A lightweight, offline-first Android app for military-grade text encryption.*
+<br>
 
-[![GitHub release](https://img.shields.io/badge/release-v1.3.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
+<table>
+  <tr>
+    <td align="center"><img src="art/image1.jpg" width="200"></td>
+    <td align="center"><img src="art/image2.jpg" width="200"></td>
+    <td align="center"><img src="art/image3.jpg" width="200"></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="art/image4.jpg" width="200"></td>
+    <td align="center"><img src="art/image5.jpg" width="200"></td>
+    <td align="center"><img src="art/image6.jpg" width="200"></td>
+  </tr>
+</table>
+
+
+
+
+[![GitHub release](https://img.shields.io/badge/release-v2.0.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-green)](https://android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)](https://kotlinlang.org)
@@ -33,11 +67,20 @@
 | 🔒 *Strong Encryption* | AES‑256‑GCM with **Argon2id** key derivation. |
 | 📴 *100% Offline* | No internet permission. Your data never leaves your device. |
 | 👁️ *Screenshot Blocked* | Prevents accidental leaks via screenshots or screen recording. |
-| 🧹 *Zero Storage* | No logs, no cache, no database. Inputs wiped from memory immediately. |
-| 🌓 *Modern UI* | Sleek Material 3 design with dark theme and smooth animations. |
+| 🌓 *Modern UI* | Sleek Material 3 design with dark theme. |
 | 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Bahasa Indonesia, Türkçe. |
 | 📋 *Copy & Clear* | One‑tap copy to clipboard and quick clear of sensitive fields. |
 | 🔑 *Password Generator* | Generate strong random passwords with customizable length. |
+| 📦 *Anonymous Boxes* | Encrypted chat boxes with individual passwords for organized conversations. |
+| 💬 *Chat System* | End-to-end encrypted messaging inside each box with decrypt-on-demand. |
+| 🗄️ *Encrypted Database* | Room + SQLCipher for encrypted local storage of boxes and messages. |
+| 🔐 *PIN Lock* | 4-8 digit PIN with brute-force protection (5 attempts → 30s lockout). |
+| 👆 *Biometric Unlock* | Fingerprint authentication via Android BiometricPrompt API. |
+| 🧹 *Auto-Delete* | Messages auto-deleted after 1h, 6h, 12h, 1d, 7d, 30d, or 90d. |
+| 🔢 *Character Counter* | Real-time character count for input and output fields. |
+| 📤 *Share Intent* | Receive and encrypt text from WhatsApp, Telegram, and other apps. |
+| 🔄 *Lock Modes* | Per-box password modes: always ask, timed, session, or permanent (encrypted in Keystore). |
+| 🔑 *Change Password* | Re-encrypt all messages when changing a box password with per-message error handling. |
 
 ---
 
@@ -48,6 +91,10 @@
 - **Build System**: Gradle 8.13 (KTS)
 - **CI/CD**: GitHub Actions
 - **Key Derivation**: Argon2id (argon2kt)
+- **Database**: Room + SQLCipher (encrypted SQLite)
+- **Secure Storage**: EncryptedSharedPreferences + Android Keystore
+- **Biometric**: AndroidX Biometric API
+- **Background Work**: WorkManager (auto-delete messages)
 - **Min SDK**: Android 7.0 (API 24)
 - **Target SDK**: Android 15 (API 35)
 
@@ -63,7 +110,7 @@ cd CryptoSafe
 ```
 The APK will be located at `app/build/outputs/apk/release/`.
 
-*Note: Release builds require a keystore; use `assembleDebug` for testing.*
+*Note: Release builds require a keystore and passwords (set via `CRYPTOSAFE_STORE_PASSWORD` / `CRYPTOSAFE_KEY_PASSWORD` env vars or in `local.properties`); use `assembleDebug` for testing.*
 
 ---
 
@@ -110,12 +157,15 @@ The "AllowedAPKSigningKeys" field in the F-Droid metadata ensures that official 
 | Encryption Algorithm | AES‑256 in GCM mode (authenticated encryption). |
 | Key Derivation | **Argon2id** (128 MiB, 4 iterations, 4 lanes), 16‑byte salt. |
 | Password Handling | CharArray used and zeroed after each operation. Password state cleared from UI immediately; may persist in heap briefly due to String immutability. |
-| Data at Rest | Nothing stored. All operations happen in RAM. |
+| PIN Storage | Hashed with Argon2id + salt in EncryptedSharedPreferences. |
+| Data at Rest | Room + SQLCipher for encrypted local database. |
 | Network | No INTERNET permission declared. |
 | Backup | `android:allowBackup="false"` prevents cloud backup of app data. |
 | Screenshot | FLAG_SECURE blocks screenshots and screen recording. |
+| Biometric | AndroidX BiometricPrompt API for fingerprint unlock. |
+| Brute-force Protection | 5 failed PIN attempts → 30 second lockout. |
 
-*Warning: If you lose your password, encrypted data cannot be recovered. Keep backups of both encrypted text and passwords in a safe place.*
+*Warning: If you lose your password or PIN, encrypted data cannot be recovered. Keep backups of both encrypted text and passwords in a safe place.*
 
 ---
 

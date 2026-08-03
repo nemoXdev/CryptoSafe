@@ -127,18 +127,18 @@ fun PasswordStrengthCard(
                 trackColor = strengthColor.copy(alpha = 0.2f)
             )
             Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(LocalizationManager.getString("count") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(LocalizationManager.getString("count") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
                 val isOverLimit = password.size >= 999
                 val countColor = if (isOverLimit) Color(0xFFCF6679) else Color(0xFF2196F3)
                 Text("${password.size}", style = MaterialTheme.typography.labelSmall, color = countColor, fontWeight = FontWeight.Medium)
             }
             Row(modifier = Modifier.fillMaxWidth().padding(top = 2.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(LocalizationManager.getString("password_strength") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(LocalizationManager.getString("password_strength") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
                 Text(LocalizationManager.getString(strength.second), style = MaterialTheme.typography.labelSmall, color = strengthColor, fontWeight = FontWeight.Medium)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Text(LocalizationManager.getString("length") + ": ${passwordLength.toInt()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            Text(LocalizationManager.getString("length") + ": ${passwordLength.toInt()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
             Spacer(modifier = Modifier.height(4.dp))
 
             val minVal = 8f
@@ -214,7 +214,7 @@ fun PasswordStrengthCard(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 listOf(8, 16, 32, 64, 96, 120).forEach { len ->
-                    Text("$len", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), modifier = Modifier.clickable { passwordLength = len.toFloat(); savePrefs() })
+                    Text("$len", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.clickable { passwordLength = len.toFloat(); savePrefs() })
                 }
             }
 

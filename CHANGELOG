@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.0] - 2026-07-30
+
+### Added
+- Anonymous Encrypted Boxes with per-box passwords
+- App Lock with PIN and Biometric unlock (fingerprint)
+- Encrypted database (SQLCipher)
+- Share intent from other apps (WhatsApp, Telegram, etc.)
+- Auto-delete messages (1 hour to 90 days)
+- Settings screen with security options
+- Help & Guide screen with detailed documentation
+
+
 ## [1.3.0] - 2026-07-18
 
 ### Added

@@ -1,11 +1,15 @@
-CryptoSafe is a lightweight, offline-first Android app for military-grade text encryption. Your data never leaves your device.
+CryptoSafe is a lightweight, offline-first Android app for military-grade text encryption with Anonymous Encrypted Boxes. Your data never leaves your device.
 
 Features:
 • Strong Encryption: AES-256-GCM with Argon2id key derivation (128 MiB, 4 iterations)
-• 100% Offline: No internet permission needed. Your data never leaves your device
-• Screenshot Blocked: FLAG_SECURE prevents accidental leaks
-• Zero Storage: No logs, no cache, no database
-• Modern UI: Material 3 design with dark theme and smooth animations
-• Copy & Clear: One-tap copy and quick clear of sensitive fields
+• Encrypted Boxes: Organize conversations in password-protected boxes with per-box passwords
+• App Lock: PIN and Biometric (fingerprint) unlock with auto-lock timer
+• Encrypted Database: All data stored in SQLCipher encrypted database
+• 100% Offline: No internet permission needed
+• Share to Box: Receive text shared from WhatsApp, Telegram, and other apps
+• Auto-delete Messages: Set messages to auto-delete after 1 hour to 90 days
+• Screenshot Protection: FLAG_SECURE prevents accidental leaks
+• Password Generator: Built-in random password generator
+• Modern UI: Material 3 design with dark theme
 
-Perfect for journalists, activists, and anyone who needs to encrypt sensitive text messages without relying on cloud services or internet connectivity.
+
