@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -36,14 +36,16 @@ import com.cryptosafe.app.LocalizationManager
 fun OutputCard(
     outputText: String,
     onCopy: () -> Unit,
-    onClear: () -> Unit
+    onClear: () -> Unit,
+    onShare: () -> Unit,
+    showCounter: Boolean = true
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 LocalizationManager.getString("output") + ":",
                 color = MaterialTheme.colorScheme.primary,
@@ -59,26 +61,50 @@ fun OutputCard(
                     .fillMaxWidth()
                     .heightIn(min = 80.dp, max = 200.dp),
                 textStyle = TextStyle(fontSize = 13.sp, fontFamily = FontFamily.Monospace),
-                shape = RoundedCornerShape(8.dp)
+                shape = MaterialTheme.shapes.small
             )
+            if (showCounter && outputText.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp, bottom = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "${outputText.codePointCount(0, outputText.length)} ${LocalizationManager.getString("chars")}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    )
+                }
+            }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
                     onClick = onCopy,
                     modifier = Modifier.weight(1f).height(40.dp),
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.extraSmall,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Icon(Icons.Default.ContentCopy, null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(LocalizationManager.getString("copy"))
                 }
+                Button(
+                    onClick = onShare,
+                    modifier = Modifier.weight(1f).height(40.dp),
+                    shape = MaterialTheme.shapes.extraSmall,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Default.Share, null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(LocalizationManager.getString("share"))
+                }
                 OutlinedButton(
                     onClick = onClear,
                     modifier = Modifier.weight(1f).height(40.dp),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = MaterialTheme.shapes.extraSmall
                 ) {
                     Icon(Icons.Default.Clear, null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(4.dp))
