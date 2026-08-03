@@ -6,7 +6,7 @@
   "whats_new_title": "Novidades",
   "whats_new_body": "Versão 2.0.0:\n• Bloqueio de app com PIN e biométrico.\n• Caixas anônimas com chat criptografado.\n• Banco de dados criptografado (SQLCipher).\n• Intent de compartilhamento de outros apps.\n• Tela de configurações.\n• Exclusão automática de mensagens.\n• Contador de caracteres.\n• Melhorias gerais.",
   "how_to_use_title": "Como usar",
-  "how_to_use": "• Defina um PIN nas Configurações para bloquear o app.\n• Use Criptografar/Descriptografar para criptografia rápida.\n• Crie Caixas para conversas organizadas.\n• Compartilhe texto criptografado do WhatsApp/Telegram.\n• Mensagens nas caixas permanecem criptografadas até serem descriptografadas.",
+  "how_to_use": "• Defina um PIN nas Configurações para bloquear o app.\n• Use Criptografar/Descriptografar para criptografia rápida.\n• Crie Caixas para conversas organizadas.\n• Compartilhe texto criptografado de qualquer aplicativo.\n• Mensagens nas caixas permanecem criptografadas até serem descriptografadas.",
   "disclaimer_title": "Aviso legal",
   "disclaimer_body": "Este aplicativo é fornecido 'como está' sem garantias. O desenvolvedor não se responsabiliza por perda de dados ou violações de segurança. Mantenha sempre backups de seus dados criptografados e senhas em um local seguro."
 }

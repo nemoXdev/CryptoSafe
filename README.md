@@ -67,20 +67,21 @@ Your support means a lot! If you find CryptoSafe useful, please:
 | 🔒 *Strong Encryption* | AES‑256‑GCM with **Argon2id** key derivation. |
 | 📴 *100% Offline* | No internet permission. Your data never leaves your device. |
 | 👁️ *Screenshot Blocked* | Prevents accidental leaks via screenshots or screen recording. |
-| 🌓 *Modern UI* | Sleek Material 3 design with dark theme. |
-| 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Bahasa Indonesia, Türkçe. |
-| 📋 *Copy & Clear* | One‑tap copy to clipboard and quick clear of sensitive fields. |
-| 🔑 *Password Generator* | Generate strong random passwords with customizable length. |
+| 🔐 *PIN Lock* | Custom PIN (4–32 characters) with brute-force protection (5 attempts → 30s lockout). |
+| 👆 *Biometric Unlock* | Fingerprint authentication via Android BiometricPrompt API. |
+| 🗄️ *Encrypted Database* | Room + SQLCipher for encrypted local storage of boxes and messages. |
 | 📦 *Anonymous Boxes* | Encrypted chat boxes with individual passwords for organized conversations. |
 | 💬 *Chat System* | End-to-end encrypted messaging inside each box with decrypt-on-demand. |
-| 🗄️ *Encrypted Database* | Room + SQLCipher for encrypted local storage of boxes and messages. |
-| 🔐 *PIN Lock* | 4-8 digit PIN with brute-force protection (5 attempts → 30s lockout). |
-| 👆 *Biometric Unlock* | Fingerprint authentication via Android BiometricPrompt API. |
-| 🧹 *Auto-Delete* | Messages auto-deleted after 1h, 6h, 12h, 1d, 7d, 30d, or 90d. |
-| 🔢 *Character Counter* | Real-time character count for input and output fields. |
-| 📤 *Share Intent* | Receive and encrypt text from WhatsApp, Telegram, and other apps. |
-| 🔄 *Lock Modes* | Per-box password modes: always ask, timed, session, or permanent (encrypted in Keystore). |
+| 📤 *Share Intent* | Receive text shared from WhatsApp, Telegram, and other apps for quick encrypt, decrypt, or storing in a box. |
+| 🔄 *Lock Modes* | Per-box password modes: ask every time, remember for a set time, remember for the session, or remember permanently (stored encrypted). |
 | 🔑 *Change Password* | Re-encrypt all messages when changing a box password with per-message error handling. |
+| 🧹 *Auto-Delete* | Messages auto-deleted after 1h, 6h, 12h, 1d, 7d, 30d, or 90d. |
+| 🔢 *Character Counter* | Real-time character count for input and output fields and in chat messages. |
+| 🔑 *Password Generator* | Generate strong random passwords with customizable length. |
+| 📋 *Copy & Clear* | One‑tap copy to clipboard and quick clear of sensitive fields. |
+| ❓ *Help & Guide* | Step-by-step guide for all features, available from the settings screen. |
+| 🌓 *Modern UI* | Sleek Material 3 design with dark theme. |
+| 🌐 *15 Languages* | English, العربية, Français, Español, Deutsch, 简体中文, Português, فارسی, کوردی, हिन्दी, Русский, 日本語, 한국어, Bahasa Indonesia, Türkçe. |
 
 ---
 
