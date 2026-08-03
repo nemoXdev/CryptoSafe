@@ -3,3 +3,5 @@
 -keep class kotlin.Metadata { *; }
 -keep class net.sqlcipher.** { *; }
 -keep class net.zetetic.** { *; }
+-dontwarn com.google.errorprone.annotations.**
+-dontwarn javax.annotation.**
