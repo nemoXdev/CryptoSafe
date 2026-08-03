@@ -72,6 +72,7 @@ fun ChatScreen(
     box: Box,
     boxPassword: String,
     database: AppDatabase,
+    locked: Boolean = false,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -84,6 +85,11 @@ fun ChatScreen(
     var messageToDelete by remember { mutableStateOf<Message?>(null) }
     var showDecryptWarning by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
+
+    // عند قفل التطبيق تُغلق نافذة تأكيد الحذف فوراً (نافذة منفصلة تبقى ظاهرة فوق شاشة القفل)
+    LaunchedEffect(locked) {
+        if (locked) messageToDelete = null
+    }
 
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {

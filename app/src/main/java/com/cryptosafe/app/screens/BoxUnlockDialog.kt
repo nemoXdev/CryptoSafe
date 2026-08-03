@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
@@ -36,6 +37,9 @@ import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.PasswordDialog
 import com.cryptosafe.app.components.SafePasswordField
 import com.cryptosafe.app.data.Box
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * يطلب كلمة مرور الصندوق ويتحقق منها مقابل box.passwordHash قبل السماح بالدخول.
@@ -51,6 +55,8 @@ fun BoxUnlockDialog(
     val context = LocalContext.current
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
+    var isVerifying by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
     val passwordFocusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -59,17 +65,25 @@ fun BoxUnlockDialog(
     }
 
     PasswordDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!isVerifying) onDismiss() },
         title = LocalizationManager.getString("enter_box_password"),
         confirmText = LocalizationManager.getString("ok"),
-        confirmEnabled = password.isNotEmpty(),
+        confirmEnabled = password.isNotEmpty() && !isVerifying,
         onConfirm = {
-            if (CryptoEngine.verifyPasswordForStorage(password, box.passwordHash)) {
-                val verified = password
+            val candidate = password
+            isVerifying = true
+            // التحقق باشتقاق Argon2 (ثقيل ~1 ثانية) خارج خيط الواجهة حتى لا تتجمد الشاشة
+            scope.launch {
+                val valid = withContext(Dispatchers.IO) {
+                    CryptoEngine.verifyPasswordForStorage(candidate, box.passwordHash)
+                }
+                isVerifying = false
                 password = ""
-                onUnlocked(verified)
-            } else {
-                Toast.makeText(context, LocalizationManager.getString("wrong_password"), Toast.LENGTH_SHORT).show()
+                if (valid) {
+                    onUnlocked(candidate)
+                } else {
+                    Toast.makeText(context, LocalizationManager.getString("wrong_password"), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     ) {

@@ -2,16 +2,29 @@ package com.cryptosafe.app.data
 
 import androidx.room.Dao
 import androidx.room.Delete
+import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
+data class BoxWithCount(
+    @Embedded val box: Box,
+    val messageCount: Int
+)
+
 @Dao
 interface BoxDao {
     @Query("SELECT * FROM boxes ORDER BY createdAt DESC")
     fun getAllBoxes(): Flow<List<Box>>
+
+    @Query(
+        "SELECT boxes.*, " +
+            "(SELECT COUNT(*) FROM messages WHERE messages.boxId = boxes.id) AS messageCount " +
+            "FROM boxes ORDER BY createdAt DESC"
+    )
+    fun getAllBoxesWithCount(): Flow<List<BoxWithCount>>
 
     @Query("SELECT * FROM boxes ORDER BY createdAt DESC")
     suspend fun getAllBoxesSync(): List<Box>

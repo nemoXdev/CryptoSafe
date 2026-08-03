@@ -1,6 +1,5 @@
 package com.cryptosafe.app.screens
 
-import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,14 +27,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -45,8 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.data.AppDatabase
 import com.cryptosafe.app.data.Box
-import com.cryptosafe.app.security.SecurePasswordStorage
-import kotlinx.coroutines.launch
+import com.cryptosafe.app.data.BoxWithCount
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -58,26 +51,22 @@ fun BoxesScreen(
     onCreateBox: () -> Unit,
     onBoxSettings: (Box) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val boxes by database.boxDao().getAllBoxes().collectAsState(initial = emptyList())
+    val boxes by database.boxDao().getAllBoxesWithCount().collectAsState(initial = emptyList())
 
     BoxWithContent(
         boxes = boxes,
         onCreateBox = onCreateBox,
         onBoxClick = onBoxClick,
-        onBoxSettings = onBoxSettings,
-        database = database
+        onBoxSettings = onBoxSettings
     )
 }
 
 @Composable
 private fun BoxWithContent(
-    boxes: List<Box>,
+    boxes: List<BoxWithCount>,
     onCreateBox: () -> Unit,
     onBoxClick: (Box) -> Unit,
-    onBoxSettings: (Box) -> Unit,
-    database: AppDatabase
+    onBoxSettings: (Box) -> Unit
 ) {
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
@@ -125,13 +114,13 @@ private fun BoxWithContent(
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(boxes, key = { it.id }) { box ->
+                items(boxes, key = { it.box.id }) { item ->
                     BoxCard(
-                        box = box,
+                        box = item.box,
+                        msgCount = item.messageCount,
                         dateFormat = dateFormat,
-                        database = database,
-                        onClick = { onBoxClick(box) },
-                        onSettings = { onBoxSettings(box) }
+                        onClick = { onBoxClick(item.box) },
+                        onSettings = { onBoxSettings(item.box) }
                     )
                 }
             }
@@ -153,13 +142,11 @@ private fun BoxWithContent(
 @Composable
 private fun BoxCard(
     box: Box,
+    msgCount: Int,
     dateFormat: SimpleDateFormat,
-    database: AppDatabase,
     onClick: () -> Unit,
     onSettings: () -> Unit
 ) {
-    val msgCount by database.boxDao().getMessageCount(box.id).collectAsState(initial = 0)
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
