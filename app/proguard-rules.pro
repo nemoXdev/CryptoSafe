@@ -1,3 +1,5 @@
 -keepattributes *Annotation*, InnerClasses
 -dontnote kotlinx.coroutines.**
 -keep class kotlin.Metadata { *; }
+-keep class net.sqlcipher.** { *; }
+-keep class net.zetetic.** { *; }

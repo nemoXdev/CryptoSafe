@@ -9,13 +9,27 @@ import javax.crypto.Cipher
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+interface KeyDeriver {
+    fun derive(
+        password: ByteArray,
+        salt: ByteArray,
+        mCostInKibibyte: Int,
+        hashLengthInBytes: Int
+    ): ByteArray
+}
+
 object CryptoEngine {
 
     private const val SALT_LENGTH = 16
     private const val IV_LENGTH = 12
     private const val KEY_LENGTH = 256
 
-    private val argon2 by lazy { Argon2Kt() }
+    /**
+     * حقن دالة اشتقاق المفتاح لأغراض الاختبار على JVM (Robolectric).
+     * الافتراضي هو Argon2id (Argon2Deriver). لا تعدّلها خارج الاختبارات.
+     */
+    @Volatile
+    internal var keyDeriver: KeyDeriver = Argon2Deriver
 
     fun encrypt(plainText: String, password: CharArray): String {
         val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
@@ -54,18 +68,11 @@ object CryptoEngine {
         byteBuffer.get(passwordBytes)
         byteBuffer.clear()
         charBuffer.clear()
-
-        val result = argon2.hash(
-            mode = Argon2Mode.ARGON2_ID,
-            password = passwordBytes,
-            salt = salt,
-            tCostInIterations = 4,
-            mCostInKibibyte = 131072,
-            parallelism = 4,
-            hashLengthInBytes = KEY_LENGTH / 8
-        )
-        passwordBytes.fill(0)
-        return result.rawHashAsByteArray()
+        return try {
+            keyDeriver.derive(passwordBytes, salt, 131072, KEY_LENGTH / 8)
+        } finally {
+            passwordBytes.fill(0)
+        }
     }
 
     fun generatePassword(length: Int = 16): String {
@@ -87,11 +94,18 @@ object CryptoEngine {
 
     fun checkPasswordStrength(password: CharArray): Pair<Int, String> {
         val length = password.size
-        val str = String(password)
-        val hasUpper = str.any { it.isUpperCase() }
-        val hasLower = str.any { it.isLowerCase() }
-        val hasDigit = str.any { it.isDigit() }
-        val hasSymbol = str.any { !it.isLetterOrDigit() }
+        var hasUpper = false
+        var hasLower = false
+        var hasDigit = false
+        var hasSymbol = false
+        for (c in password) {
+            when {
+                c.isUpperCase() -> hasUpper = true
+                c.isLowerCase() -> hasLower = true
+                c.isDigit() -> hasDigit = true
+                else -> hasSymbol = true
+            }
+        }
         val hasAll = hasUpper && hasLower && hasDigit && hasSymbol
 
         val (score, levelKey) = when {
@@ -101,5 +115,73 @@ object CryptoEngine {
             else -> 1 to "weak"
         }
         return Pair(score, levelKey)
+    }
+
+    fun hashPin(pin: String): String {
+        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
+        val pinBytes = pin.toByteArray(Charsets.UTF_8)
+        val result = keyDeriver.derive(pinBytes, salt, 65536, 32)
+        val combined = salt + result
+        return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
+    }
+
+    fun verifyPin(pin: String, storedHash: String): Boolean {
+        return try {
+            val decoded = android.util.Base64.decode(storedHash, android.util.Base64.NO_WRAP)
+            val salt = decoded.sliceArray(0 until SALT_LENGTH)
+            val expectedHash = decoded.sliceArray(SALT_LENGTH until decoded.size)
+
+            val pinBytes = pin.toByteArray(Charsets.UTF_8)
+            keyDeriver.derive(pinBytes, salt, 65536, 32).contentEquals(expectedHash)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun hashPasswordForStorage(password: String): String {
+        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
+        val passwordBytes = password.toByteArray(Charsets.UTF_8)
+        val result = keyDeriver.derive(passwordBytes, salt, 65536, 32)
+        val combined = salt + result
+        return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
+    }
+
+    /**
+     * يتحقق من كلمة مرور صندوق مقابل الهاش المخزّن (نفس صيغة hashPasswordForStorage).
+     * لا يخزن ولا يعيد كلمة المرور نفسها أبداً — فقط true/false.
+     */
+    fun verifyPasswordForStorage(password: String, storedHash: String): Boolean {
+        return try {
+            val decoded = android.util.Base64.decode(storedHash, android.util.Base64.NO_WRAP)
+            val salt = decoded.sliceArray(0 until SALT_LENGTH)
+            val expectedHash = decoded.sliceArray(SALT_LENGTH until decoded.size)
+
+            val passwordBytes = password.toByteArray(Charsets.UTF_8)
+            keyDeriver.derive(passwordBytes, salt, 65536, 32).contentEquals(expectedHash)
+        } catch (e: Exception) {
+            false
+        }
+    }
+}
+
+private object Argon2Deriver : KeyDeriver {
+    private val argon2 by lazy { Argon2Kt() }
+
+    override fun derive(
+        password: ByteArray,
+        salt: ByteArray,
+        mCostInKibibyte: Int,
+        hashLengthInBytes: Int
+    ): ByteArray {
+        val result = argon2.hash(
+            mode = Argon2Mode.ARGON2_ID,
+            password = password,
+            salt = salt,
+            tCostInIterations = 4,
+            mCostInKibibyte = mCostInKibibyte,
+            parallelism = 4,
+            hashLengthInBytes = hashLengthInBytes
+        )
+        return result.rawHashAsByteArray()
     }
 }

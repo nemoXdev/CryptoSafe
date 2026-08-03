@@ -1,0 +1,12 @@
+{
+  "about": "Hakkında",
+  "developer": "Geliştirici",
+  "source_code": "Kaynak Kodu",
+  "version": "Sürüm",
+  "whats_new_title": "Yenilikler",
+  "whats_new_body": "Sürüm 2.0.0:\n• PIN ve biyometrik ile uygulama kilidi.\n• Şifrelenmiş sohbet ile anonim kutular.\n• Şifrelenmiş veritabanı (SQLCipher).\n• Diğer uygulamalardan paylaşım niyeti.\n• Ayarlar ekranı.\n• Otomatik mesaj silme.\n• Karakter sayacı.\n• Genel iyileştirmeler.",
+  "how_to_use_title": "Nasıl Kullanılır",
+  "how_to_use": "• Uygulamayı kilitlemek için Ayarlar'da bir PIN ayarlayın.\n• Hızlı metin şifreleme için Şifrele/Şifreyi Çöz'ü kullanın.\n• Düzenli konuşmalar için Kutular oluşturun.\n• WhatsApp/Telegram'dan şifrelenmiş metin paylaşın.\n• Kutulardaki mesajlar çözülene kadar şifreli kalır.",
+  "disclaimer_title": "Sorumluluk Reddi",
+  "disclaimer_body": "Bu uygulama garanti olmaksızın 'olduğu gibi' sunulmaktadır. Geliştirici, veri kaybı veya güvenlik ihlallerinden sorumlu değildir. Şifrelenmiş verilerinizin ve şifrelerinizin her zaman yedeklerini güvenli bir yerde saklayın."
+}

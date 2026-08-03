@@ -45,9 +45,20 @@ object LocalizationManager {
 
     private fun loadLocale(context: Context, locale: String) {
         try {
-            val inputStream = context.assets.open("locales/$locale.json")
-            val json = inputStream.bufferedReader().use { it.readText() }
-            translations[locale] = JSONObject(json)
+            val combined = JSONObject()
+            val files = context.assets.list("locales/$locale") ?: return
+            for (file in files) {
+                if (!file.endsWith(".json")) continue
+                val inputStream = context.assets.open("locales/$locale/$file")
+                val json = inputStream.bufferedReader().use { it.readText() }
+                val obj = JSONObject(json)
+                val keys = obj.keys()
+                while (keys.hasNext()) {
+                    val key = keys.next()
+                    combined.put(key, obj.get(key))
+                }
+            }
+            translations[locale] = combined
         } catch (e: IOException) {
             e.printStackTrace()
         }
