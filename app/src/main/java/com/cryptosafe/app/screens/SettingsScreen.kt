@@ -1,6 +1,7 @@
 package com.cryptosafe.app.screens
 
 import android.app.Activity
+import android.content.Intent
 import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -8,14 +9,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Help
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
+import androidx.compose.material3.TextButton
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -29,6 +34,7 @@ import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -38,12 +44,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.cryptosafe.app.CryptoEngine
+import com.cryptosafe.app.DiagnosticsLogger
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.FilledField
 import com.cryptosafe.app.security.BiometricHelper
@@ -106,7 +114,7 @@ private fun SettingsToggleRow(
 }
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}) {
+fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean = false) {
     val context = LocalContext.current
     val activity = context as? Activity
     var currentPin by remember { mutableStateOf("") }
@@ -114,6 +122,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}) {
     var confirmPin by remember { mutableStateOf("") }
     var biometricEnabled by remember { mutableStateOf(SecurePasswordStorage.isBiometricEnabled()) }
     var screenshotEnabled by remember { mutableStateOf(SecurePasswordStorage.isScreenshotProtectionEnabled()) }
+    var showDiagnosticsDialog by remember { mutableStateOf(false) }
     var showPinFields by remember { mutableStateOf(false) }
     val pinShowCheckboxRow: @Composable () -> Unit = {
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
@@ -129,6 +138,11 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}) {
     var autoLockTimer by remember { mutableIntStateOf(SecurePasswordStorage.getAutoLockTimer()) }
     val canUseBiometric = BiometricHelper.isAvailable(context)
     val act = context as? Activity
+
+    // عند قفل التطبيق تُغلق نافذة السجل فوراً (نافذة منفصلة تبقى ظاهرة فوق شاشة القفل)
+    LaunchedEffect(locked) {
+        if (locked) showDiagnosticsDialog = false
+    }
 
     DisposableEffect(screenshotEnabled) {
         if (act != null) {
@@ -373,6 +387,27 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}) {
             }
         )
 
+        // ---- التشخيص ----
+        SectionHeader(LocalizationManager.getString("diagnostics"))
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { showDiagnosticsDialog = true }
+                .padding(vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f).padding(end = 16.dp)) {
+                Text(LocalizationManager.getString("diagnostics"), style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    LocalizationManager.getString("diagnostics_desc"),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
         // ---- المساعدة ----
         Spacer(modifier = Modifier.height(16.dp))
         Button(
@@ -389,4 +424,73 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}) {
 
         Spacer(modifier = Modifier.height(24.dp))
     }
+
+    if (showDiagnosticsDialog) {
+        DiagnosticsDialog(
+            onDismiss = { showDiagnosticsDialog = false }
+        )
+    }
+}
+
+@Composable
+private fun DiagnosticsDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val preview by remember { mutableStateOf(DiagnosticsLogger.getLogPreview()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(LocalizationManager.getString("diagnostics")) },
+        text = {
+            Column {
+                if (preview.isBlank()) {
+                    Text(LocalizationManager.getString("diagnostics_no_log"))
+                } else {
+                    Text(
+                        preview,
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontFamily = FontFamily.Monospace
+                        ),
+                        modifier = Modifier
+                            .widthIn(max = 440.dp)
+                            .heightIn(max = 300.dp)
+                            .verticalScroll(rememberScrollState())
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val file = DiagnosticsLogger.getExportFile()
+                    if (file != null) {
+                        try {
+                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                file
+                            )
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                putExtra(Intent.EXTRA_TEXT, "CryptoSafe diagnostics log")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, null))
+                        } catch (e: Exception) {
+                            Toast.makeText(context, LocalizationManager.getString("error"), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, LocalizationManager.getString("diagnostics_no_log"), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            ) {
+                Text(LocalizationManager.getString("diagnostics_share"))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(LocalizationManager.getString("close"))
+            }
+        }
+    )
 }

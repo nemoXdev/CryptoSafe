@@ -8,19 +8,24 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
-
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,9 +34,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -47,7 +54,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.fragment.app.FragmentActivity
@@ -88,6 +98,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         LocalizationManager.initialize(this)
         SecurePasswordStorage.initialize(this)
+        DiagnosticsLogger.initialize(this)
         if (ENABLE_SCREENSHOT_PROTECTION && SecurePasswordStorage.isScreenshotProtectionEnabled()) {
             window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         }
@@ -115,6 +126,9 @@ class MainActivity : FragmentActivity() {
 
         lifecycle.addObserver(androidx.lifecycle.LifecycleEventObserver { _, event ->
             when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_DESTROY -> {
+                    DiagnosticsLogger.markCleanExit(this)
+                }
                 androidx.lifecycle.Lifecycle.Event.ON_STOP -> {
                     if (SecurePasswordStorage.hasPin()) {
                         val timer = SecurePasswordStorage.getAutoLockTimer()
@@ -153,45 +167,76 @@ class MainActivity : FragmentActivity() {
                     color = Color.Black
                 ) {
                     var database by remember { mutableStateOf<AppDatabase?>(null) }
-                    var dbReady by remember { mutableStateOf(false) }
+                    var dbError by remember { mutableStateOf<String?>(null) }
+                    var dbErrorDetail by remember { mutableStateOf<String?>(null) }
 
                     LaunchedEffect(Unit) {
-                        database = withContext(Dispatchers.IO) {
-                            val passphrase = SecurePasswordStorage.getOrCreateDatabasePassphrase()
-                            AppDatabase.getInstance(this@MainActivity, passphrase)
+                        val (db, error, detail) = withContext(Dispatchers.IO) {
+                            try {
+                                val dbFile = getDatabasePath("cryptosafe.db")
+                                val hasKey = SecurePasswordStorage.getDatabasePassphrase() != null
+                                if (dbFile.exists() && dbFile.length() > 0 && !hasKey) {
+                                    // بيانات موجودة لكن مفتاحها مفقود — لا ننشئ مفتاحاً جديداً أبداً
+                                    // (إلا سيتعذر فتح البيانات القديمة وتضيع للأبد).
+                                    Triple<AppDatabase?, String?, String?>(null, "key_missing", null)
+                                } else {
+                                    val passphrase = SecurePasswordStorage.getOrCreateDatabasePassphrase()
+                                    val instance = AppDatabase.getInstance(this@MainActivity, passphrase)
+                                    instance.openHelper.writableDatabase
+                                    Triple<AppDatabase?, String?, String?>(instance, null, null)
+                                }
+                            } catch (e: Exception) {
+                                DiagnosticsLogger.logEvent("WARN", "db_open_failed class=${e.javaClass.simpleName}")
+                                Triple<AppDatabase?, String?, String?>(null, "db_failed", e.toString())
+                            }
                         }
-                        dbReady = true
+                        database = db
+                        dbError = error
+                        dbErrorDetail = detail
+                        DiagnosticsLogger.logEvent(
+                            "INFO",
+                            "startup_state db_ok=${db != null} error=$error" +
+                                " has_pin=${SecurePasswordStorage.hasPin()} locked=$isLocked"
+                        )
                     }
 
                     Box(modifier = Modifier.fillMaxSize()) {
-                        if (dbReady) {
+                        if (dbError != null) {
+                            DatabaseErrorScreen(
+                                errorType = dbError ?: "db_failed",
+                                detail = dbErrorDetail,
+                                onExit = { finish() },
+                                onContinue = { dbError = null }
+                            )
+                        } else {
                             CryptoSafeApp(
                                 sharedText = sharedText,
                                 onSharedTextConsumed = { sharedText = null },
                                 showSharePicker = if (isLocked) false else showSharePicker,
                                 onSharePickerDismiss = { showSharePicker = false },
                                 database = database,
+                                locked = isLocked,
                                 boxSessionCache = boxSessionCache,
                                 onBoxSessionCacheChange = { boxSessionCache = it }
                             )
-                        }
 
-                        if (isLocked && SecurePasswordStorage.hasPin()) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(Color.Black)
-                            ) {
-                                LockScreen(
-                                    onUnlock = {
-                                        SecurePasswordStorage.setLockedOnExit(false)
-                                        isLocked = false
-                                    },
-                                    onExit = {
-                                        SecurePasswordStorage.setLockedOnExit(true)
-                                        finish()
-                                    }
-                                )
+                            if (isLocked && SecurePasswordStorage.hasPin()) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Black)
+                                ) {
+                                    LockScreen(
+                                        onUnlock = {
+                                            SecurePasswordStorage.setLockedOnExit(false)
+                                            isLocked = false
+                                        },
+                                        onExit = {
+                                            SecurePasswordStorage.setLockedOnExit(true)
+                                            finish()
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -228,6 +273,7 @@ fun CryptoSafeApp(
     showSharePicker: Boolean = false,
     onSharePickerDismiss: () -> Unit = {},
     database: AppDatabase? = null,
+    locked: Boolean = false,
     boxSessionCache: Map<Long, Pair<String, Long>> = emptyMap(),
     onBoxSessionCacheChange: (Map<Long, Pair<String, Long>>) -> Unit = {}
 ) {
@@ -238,12 +284,19 @@ fun CryptoSafeApp(
     var showLanguageMenu by remember { mutableStateOf(false) }
     var selectedBoxId by remember { mutableLongStateOf(0L) }
     var selectedBoxPassword by remember { mutableStateOf("") }
-    var dbReady by remember { mutableStateOf(database != null) }
 
     // صندوق بانتظار إدخال كلمة مروره قبل فتح المحادثة
     var boxPendingUnlock by remember { mutableStateOf<com.cryptosafe.app.data.Box?>(null) }
     // صندوق بانتظار إدخال كلمة مروره قبل حفظ نص مُشارَك فيه
     var boxPendingShareUnlock by remember { mutableStateOf<com.cryptosafe.app.data.Box?>(null) }
+
+    // عند القفل، تُغلق أي حوارات إدخال كلمة مرور (نوافذ منفصلة تبقى ظاهرة فوق شاشة القفل)
+    LaunchedEffect(locked) {
+        if (locked) {
+            boxPendingUnlock = null
+            boxPendingShareUnlock = null
+        }
+    }
 
     var encryptPassword by remember { mutableStateOf(charArrayOf()) }
     var encryptInput by remember { mutableStateOf("") }
@@ -349,7 +402,22 @@ fun CryptoSafeApp(
                     val isCreateBox = mode == "create_box"
                     val isSettings = mode == "settings"
                     val isBoxSettings = mode == "box_settings"
-                    if (isBoxes || isCreateBox || isSettings || isBoxSettings) {
+                    if (mode == "chat") {
+                        // الاسم يُقتطع بثلاث نقاط عند الطول، وعدد الرسائل يبقى ظاهراً دائماً
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                chatBox?.name.orEmpty(),
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                            Text(
+                                " (${chatMessageCount} ${LocalizationManager.getString("messages")})",
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else if (isBoxes || isCreateBox || isSettings || isBoxSettings) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 painter = painterResource(
@@ -364,10 +432,20 @@ fun CryptoSafeApp(
                                 tint = Color.Unspecified
                             )
                             Spacer(Modifier.width(6.dp))
-                            Text(screenTitle, fontWeight = FontWeight.Bold)
+                            Text(
+                                screenTitle,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
                         }
                     } else {
-                        Text(screenTitle, fontWeight = FontWeight.Bold)
+                        Text(
+                            screenTitle,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 },
                 navigationIcon = {
@@ -509,9 +587,10 @@ fun CryptoSafeApp(
                 mode == "help" -> HelpScreen()
                 mode == "settings" -> SettingsScreen(
                     onBack = { mode = "home"; selectedTab = 0 },
-                    onHelp = { mode = "help" }
+                    onHelp = { mode = "help" },
+                    locked = locked
                 )
-                dbReady && database != null -> {
+                database != null -> {
                     when {
                         mode == "boxes" && selectedTab == 1 -> BoxesScreen(
                             database = database!!,
@@ -531,6 +610,7 @@ fun CryptoSafeApp(
                                     box = it,
                                     boxPassword = selectedBoxPassword,
                                     database = database!!,
+                                    locked = locked,
                                     onBack = { clearBoxSession(); mode = "boxes"; selectedTab = 1 }
                                 )
                             }
@@ -545,7 +625,8 @@ fun CryptoSafeApp(
                                     onBack = { mode = "boxes"; selectedTab = 1 },
                                     onPasswordChanged = {
                                         onBoxSessionCacheChange(boxSessionCache - it.id)
-                                    }
+                                    },
+                                    boxSessionCache = boxSessionCache
                                 )
                             }
                         }
@@ -681,6 +762,104 @@ fun CryptoSafeApp(
                         }
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DatabaseErrorScreen(
+    errorType: String,
+    detail: String?,
+    onExit: () -> Unit,
+    onContinue: () -> Unit
+) {
+    val context = LocalContext.current
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                Icons.Default.Warning,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier.size(48.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                LocalizationManager.getString("db_error_title"),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                textAlign = TextAlign.Center
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                if (errorType == "key_missing") {
+                    LocalizationManager.getString("db_error_key_missing")
+                } else {
+                    LocalizationManager.getString("db_error_failed")
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.85f),
+                textAlign = TextAlign.Center
+            )
+            if (detail != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    detail,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontFamily = FontFamily.Monospace
+                    ),
+                    color = Color.White.copy(alpha = 0.7f),
+                    textAlign = TextAlign.Center
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    val file = DiagnosticsLogger.getExportFile()
+                    if (file != null) {
+                        try {
+                            val uri = androidx.core.content.FileProvider.getUriForFile(
+                                context,
+                                "${context.packageName}.fileprovider",
+                                file
+                            )
+                            val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_STREAM, uri)
+                                putExtra(Intent.EXTRA_TEXT, "CryptoSafe diagnostics log")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            context.startActivity(Intent.createChooser(shareIntent, null))
+                        } catch (_: Exception) {
+                            Toast.makeText(context, LocalizationManager.getString("error"), Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, LocalizationManager.getString("diagnostics_no_log"), Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(LocalizationManager.getString("diagnostics_share"))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedButton(
+                onClick = onContinue,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = MaterialTheme.shapes.medium
+            ) {
+                Text(LocalizationManager.getString("db_error_continue"))
+            }
+            Spacer(modifier = Modifier.height(4.dp))
+            TextButton(onClick = onExit) {
+                Text(LocalizationManager.getString("db_error_exit"))
             }
         }
     }
