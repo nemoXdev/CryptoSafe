@@ -12,6 +12,8 @@
   "help_lock_permanent": "Mémoriser le mot de passe en permanence (stocké crypté dans Keystore).",
   "help_app_lock_title": "Verrouillage de l'App (PIN + Empreinte)",
   "help_app_lock_desc": "Le PIN de l'application est haché avec Argon2id (mémoire 64 Mo) et stocké dans EncryptedSharedPreferences. Il prend en charge les lettres, les chiffres et les symboles (4 à 32 caractères). 5 tentatives erronées déclenchent un verrouillage de 30 secondes. L'empreinte digitale utilise Android BiometricPrompt. Sans PIN, toute personne qui ouvre l'application a un accès complet.",
+  "help_backup_title": "Protéger votre sauvegarde",
+  "help_backup_desc": "Définir un code PIN protège vos données. Si l'application a un problème, vous pouvez récupérer toutes vos données en entrant votre code PIN. Sans code PIN, les données peuvent être perdues en cas de problème.",
   "help_auto_lock_title": "Minuteur de Verrouillage Auto",
   "help_auto_lock_desc": "Contrôle la durée pendant laquelle l'application reste déverrouillée après avoir été réduite. ",
   "help_screenshot_title": "Protection Capture d'Écran",

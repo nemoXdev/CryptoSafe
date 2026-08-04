@@ -4,37 +4,114 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.security.MessageDigest
 import java.security.SecureRandom
+import javax.crypto.Cipher
+import javax.crypto.spec.GCMParameterSpec
+import javax.crypto.spec.SecretKeySpec
 
 object SecurePasswordStorage {
-    private var encryptedPrefs: SharedPreferences? = null
-    private var masterKey: MasterKey? = null
+    private var prefs: SharedPreferences? = null
+    private var backupPrefs: SharedPreferences? = null
+    var isPassphraseLost = false
+        private set
+    var isBackupAvailable = false
+        private set
 
     fun initialize(context: Context) {
-        masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        backupPrefs = context.getSharedPreferences("cryptosafe_db_backup", Context.MODE_PRIVATE)
+        val rawPrefs = context.getSharedPreferences("cryptosafe_secure_prefs", Context.MODE_PRIVATE)
 
-        encryptedPrefs = EncryptedSharedPreferences.create(
-            context,
-            "cryptosafe_secure_prefs",
-            masterKey!!,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        try {
+            val masterKey = MasterKey.Builder(context)
+                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                .build()
+            prefs = EncryptedSharedPreferences.create(
+                context, "cryptosafe_secure_prefs", masterKey,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+            )
+            syncBackupEncrypted()
+            return
+        } catch (e: Exception) {
+            prefs = rawPrefs
+
+            val recovered = rawPrefs.getString("db_passphrase", null)
+            if (!recovered.isNullOrEmpty()) return
+
+            val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null)
+            if (!encryptedPass.isNullOrEmpty()) {
+                val rawPinHash = rawPrefs.getString("pin_hash", null)
+                if (!rawPinHash.isNullOrEmpty()) {
+                    try {
+                        val decrypted = decryptWithPin(encryptedPass, rawPinHash)
+                        rawPrefs.edit().putString("db_passphrase", decrypted).apply()
+                        return
+                    } catch (_: Exception) {}
+                }
+                isBackupAvailable = true
+            }
+
+            isPassphraseLost = true
+        }
+    }
+
+    private fun syncBackupEncrypted() {
+        val passphrase = prefs?.getString("db_passphrase", null) ?: return
+        val pinHash = prefs?.getString("pin_hash", null) ?: return
+        try {
+            val encrypted = encryptWithPin(passphrase, pinHash)
+            backupPrefs?.edit()?.putString("db_passphrase_enc", encrypted)?.apply()
+        } catch (_: Exception) {}
+    }
+
+    fun recoverFromBackup(pin: String): Boolean {
+        val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null) ?: return false
+        return try {
+            val pinHash = hashPin(pin)
+            val decrypted = decryptWithPin(encryptedPass, pinHash)
+            getPrefs().edit().putString("db_passphrase", decrypted).apply()
+            isPassphraseLost = false
+            isBackupAvailable = false
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun hashPin(pin: String): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        return md.digest(pin.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
     }
 
     private fun getPrefs(): SharedPreferences {
-        return encryptedPrefs ?: throw IllegalStateException("SecurePasswordStorage not initialized")
+        return prefs ?: throw IllegalStateException("SecurePasswordStorage not initialized")
     }
 
-    // ملاحظة أمنية: كلمة مرور الصندوق لا تُخزَّن هنا أبداً (لا بنص عادي ولا مشفّرة).
-    // يتم التحقق منها فقط عبر CryptoEngine.verifyPasswordForStorage() مقابل Box.passwordHash،
-    // وتبقى موجودة بالذاكرة (CharArray) طوال فتح الصندوق فقط ثم تُمسح فوراً.
-    // هذا يضمن إن فتح قفل PIN العام للتطبيق لا يعطي وصول تلقائي لأي صندوق.
+    private fun encryptWithPin(plaintext: String, pinHash: String): String {
+        val keyBytes = pinHash.toByteArray(Charsets.UTF_8).copyOf(32)
+        val key = SecretKeySpec(keyBytes, "AES")
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        val iv = ByteArray(12)
+        SecureRandom().nextBytes(iv)
+        cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(128, iv))
+        val encrypted = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
+        return android.util.Base64.encodeToString(iv + encrypted, android.util.Base64.NO_WRAP)
+    }
+
+    private fun decryptWithPin(encryptedBase64: String, pinHash: String): String {
+        val keyBytes = pinHash.toByteArray(Charsets.UTF_8).copyOf(32)
+        val key = SecretKeySpec(keyBytes, "AES")
+        val combined = android.util.Base64.decode(encryptedBase64, android.util.Base64.NO_WRAP)
+        val iv = combined.copyOfRange(0, 12)
+        val encrypted = combined.copyOfRange(12, combined.size)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, iv))
+        return String(cipher.doFinal(encrypted), Charsets.UTF_8)
+    }
 
     fun hasPin(): Boolean {
-        return getPrefs().getString("pin_hash", null)?.isNotEmpty() == true
+        return !getPrefs().getString("pin_hash", null).isNullOrEmpty()
     }
 
     fun removePinHash() {
@@ -43,6 +120,7 @@ object SecurePasswordStorage {
 
     fun savePinHash(pinHash: String) {
         getPrefs().edit().putString("pin_hash", pinHash).apply()
+        syncBackupEncrypted()
     }
 
     fun getPinHash(): String? {
@@ -65,6 +143,14 @@ object SecurePasswordStorage {
         getPrefs().edit().putLong("pin_lockout_time", time).apply()
     }
 
+    fun isScreenshotProtectionEnabled(): Boolean {
+        return getPrefs().getBoolean("screenshot_protection", true)
+    }
+
+    fun setScreenshotProtectionEnabled(enabled: Boolean) {
+        getPrefs().edit().putBoolean("screenshot_protection", enabled).apply()
+    }
+
     fun isBiometricEnabled(): Boolean {
         return getPrefs().getBoolean("biometric_enabled", true)
     }
@@ -79,29 +165,24 @@ object SecurePasswordStorage {
 
     fun saveDatabasePassphrase(passphrase: String) {
         getPrefs().edit().putString("db_passphrase", passphrase).apply()
+        syncBackupEncrypted()
+    }
+
+    fun clearDatabasePassphrase() {
+        getPrefs().edit().remove("db_passphrase").apply()
+        backupPrefs?.edit()?.remove("db_passphrase_enc")?.apply()
     }
 
     fun getOrCreateDatabasePassphrase(): ByteArray {
         val existing = getDatabasePassphrase()
         if (existing != null && existing.isNotEmpty()) return existing
-
-        val random = SecureRandom()
         val bytes = ByteArray(32)
-        random.nextBytes(bytes)
+        SecureRandom().nextBytes(bytes)
         val passphrase = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
         saveDatabasePassphrase(passphrase)
         return passphrase.toByteArray()
     }
 
-    fun isScreenshotProtectionEnabled(): Boolean {
-        return getPrefs().getBoolean("screenshot_protection", true)
-    }
-
-    fun setScreenshotProtectionEnabled(enabled: Boolean) {
-        getPrefs().edit().putBoolean("screenshot_protection", enabled).apply()
-    }
-
-    // ---- كلمات مرور الصناديق الدائمة (permanent mode) ----
     fun saveBoxPassword(boxId: Long, password: String) {
         getPrefs().edit().putString("box_perm_$boxId", password).apply()
     }
@@ -118,9 +199,8 @@ object SecurePasswordStorage {
         return getPrefs().contains("box_perm_$boxId")
     }
 
-    // ---- مؤقت القفل التلقائي (auto-lock timer) ----
     fun getAutoLockTimer(): Int {
-        return getPrefs().getInt("auto_lock_timer", 0) // 0 = فوري
+        return getPrefs().getInt("auto_lock_timer", 0)
     }
 
     fun setAutoLockTimer(seconds: Int) {
@@ -135,11 +215,6 @@ object SecurePasswordStorage {
         getPrefs().edit().putLong("last_stop_time", time).apply()
     }
 
-    // ---- قفل إلزامي عند إعادة الفتح ----
-    // يُفعَّل عند الخروج من التطبيق عبر زر "إلغاء" في شاشة القفل (finish).
-    // أي: المستخدم كان مقفولاً ولم ينجح أي فك قفل، فالعودة يجب أن تطلب الرمز دائماً
-    // مهما كانت مدة مؤقت القفل التلقائي (التسجيل في last_stop_time في ON_STOP
-    // كان يسمح بإعادة الفتح داخل مدة المؤقت بدون رمز).
     fun isLockedOnExit(): Boolean {
         return getPrefs().getBoolean("locked_on_exit", false)
     }

@@ -19,6 +19,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Home
@@ -26,6 +28,8 @@ import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +39,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,9 +61,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.fragment.app.FragmentActivity
 import com.cryptosafe.app.data.AppDatabase
@@ -205,8 +213,28 @@ class MainActivity : FragmentActivity() {
                             DatabaseErrorScreen(
                                 errorType = dbError ?: "db_failed",
                                 detail = dbErrorDetail,
+                                isBackupAvailable = SecurePasswordStorage.isBackupAvailable,
                                 onExit = { finish() },
-                                onContinue = { dbError = null }
+                                onContinue = { dbError = null },
+                                onRecover = { pin ->
+                                    if (SecurePasswordStorage.recoverFromBackup(pin)) {
+                                        val intent = packageManager.getLaunchIntentForPackage(packageName)
+                                        finish()
+                                        startActivity(intent)
+                                        true
+                                    } else false
+                                },
+                                onReset = {
+                                    try {
+                                        getDatabasePath("cryptosafe.db").delete()
+                                        getDatabasePath("cryptosafe.db-shm").delete()
+                                        getDatabasePath("cryptosafe.db-wal").delete()
+                                    } catch (_: Exception) {}
+                                    SecurePasswordStorage.clearDatabasePassphrase()
+                                    val intent = packageManager.getLaunchIntentForPackage(packageName)
+                                    finish()
+                                    startActivity(intent)
+                                }
                             )
                         } else {
                             CryptoSafeApp(
@@ -771,15 +799,23 @@ fun CryptoSafeApp(
 private fun DatabaseErrorScreen(
     errorType: String,
     detail: String?,
+    isBackupAvailable: Boolean = false,
     onExit: () -> Unit,
-    onContinue: () -> Unit
+    onContinue: () -> Unit,
+    onRecover: (String) -> Boolean,
+    onReset: () -> Unit
 ) {
     val context = LocalContext.current
+    var pinInput by remember { mutableStateOf("") }
+    var pinError by remember { mutableStateOf(false) }
+    var isRecovering by remember { mutableStateOf(false) }
+
     Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(32.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -799,7 +835,9 @@ private fun DatabaseErrorScreen(
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                if (errorType == "key_missing") {
+                if (isBackupAvailable) {
+                    LocalizationManager.getString("db_error_backup_available")
+                } else if (errorType == "key_missing") {
                     LocalizationManager.getString("db_error_key_missing")
                 } else {
                     LocalizationManager.getString("db_error_failed")
@@ -819,6 +857,44 @@ private fun DatabaseErrorScreen(
                     textAlign = TextAlign.Center
                 )
             }
+
+            if (isBackupAvailable) {
+                Spacer(modifier = Modifier.height(20.dp))
+                OutlinedTextField(
+                    value = pinInput,
+                    onValueChange = { pinInput = it; pinError = false },
+                    label = { Text(LocalizationManager.getString("pin")) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = pinError,
+                    supportingText = if (pinError) {
+                        { Text(LocalizationManager.getString("pin_wrong"), color = MaterialTheme.colorScheme.error) }
+                    } else null,
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = {
+                        if (pinInput.isNotEmpty()) {
+                            isRecovering = true
+                            val success = onRecover(pinInput)
+                            isRecovering = false
+                            if (!success) pinError = true
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth().height(48.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    enabled = pinInput.isNotEmpty() && !isRecovering
+                ) {
+                    if (isRecovering) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
+                    } else {
+                        Text(LocalizationManager.getString("db_error_recover"))
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
@@ -856,6 +932,17 @@ private fun DatabaseErrorScreen(
                 shape = MaterialTheme.shapes.medium
             ) {
                 Text(LocalizationManager.getString("db_error_continue"))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(
+                onClick = onReset,
+                modifier = Modifier.fillMaxWidth().height(48.dp),
+                shape = MaterialTheme.shapes.medium,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                )
+            ) {
+                Text(LocalizationManager.getString("db_error_reset"))
             }
             Spacer(modifier = Modifier.height(4.dp))
             TextButton(onClick = onExit) {

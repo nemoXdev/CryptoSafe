@@ -12,6 +12,8 @@
   "help_lock_permanent": "Recordar la contraseña permanentemente (almacenada cifrada en Keystore).",
   "help_app_lock_title": "Bloqueo de App (PIN + Huella)",
   "help_app_lock_desc": "El PIN de la app se procesa con Argon2id (memoria de 64MB) y se almacena en EncryptedSharedPreferences. Admite letras, números y símbolos (de 4 a 32 caracteres). 5 intentos fallidos provocan un bloqueo de 30 segundos. La huella dactilar usa Android BiometricPrompt. Sin PIN, cualquiera que abra la app tiene acceso total.",
+  "help_backup_title": "Proteger la copia de seguridad",
+  "help_backup_desc": "Establecer un PIN protege sus datos. Si la aplicación tiene un problema, puede recuperar todos sus datos introduciendo su PIN. Sin PIN, los datos pueden perderse si algo sale mal.",
   "help_auto_lock_title": "Temporizador de Autobloqueo",
   "help_auto_lock_desc": "Controle cuánto tiempo permanece desbloqueada la aplicación después de ser minimizada.",
   "help_screenshot_title": "Protección de Capturas",

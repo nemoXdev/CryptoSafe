@@ -12,6 +12,8 @@
   "help_lock_permanent": "Remember password across restarts. Password is stored encrypted in the device Keystore. Only available if you accept the security risk.",
   "help_app_lock_title": "App Lock (PIN + Fingerprint)",
   "help_app_lock_desc": "The app PIN is hashed with Argon2id (64MB memory) and stored in EncryptedSharedPreferences. It supports letters, numbers, and symbols (4 to 32 characters). 5 wrong attempts trigger a 30-second lockout. Fingerprint uses Android BiometricPrompt. Without a PIN, anyone who opens the app has full access.",
+  "help_backup_title": "Protect Your Data Backup",
+  "help_backup_desc": "Setting a PIN protects your data. If the app has a problem, you can recover all your data by entering your PIN. Without a PIN, data may be lost if something goes wrong.",
   "help_auto_lock_title": "Auto-lock Timer",
   "help_auto_lock_desc": "Controls how long the app stays unlocked after being minimized. Immediate: locks as soon as you leave the app. 30s-30min: you can return without re-entering PIN if the time hasn't expired. Only works if an app PIN is set.",
   "help_screenshot_title": "Screenshot Protection",

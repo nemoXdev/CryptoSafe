@@ -12,6 +12,8 @@
   "help_lock_permanent": "비밀번호를 영구적으로 기억하십시오(키 저장소에 암호화되어 저장됨).",
   "help_app_lock_title": "앱 잠금 (PIN + 지문)",
   "help_app_lock_desc": "앱 PIN은 Argon2id(64MB 메모리)로 해시되어 EncryptedSharedPreferences에 저장됩니다. 문자, 숫자, 기호(4~32자)를 지원합니다. 5회 오류 시 30초 잠금이 발생합니다. 지문은 Android BiometricPrompt를 사용합니다. PIN이 없으면 앱을 여는 사람은 누구나 완전한 액세스 권한을 갖습니다.",
+  "help_backup_title": "데이터 백업 보호",
+  "help_backup_desc": "PIN을 설정하면 데이터가 보호됩니다. 앱에 문제가 발생하면 PIN을 입력하여 모든 데이터를 복구할 수 있습니다. PIN이 없으면 문제가 발생하면 데이터가 손실될 수 있습니다.",
   "help_auto_lock_title": "자동 잠금 타이머",
   "help_auto_lock_desc": "앱이 최소화된 후 잠금 해제 상태로 유지되는 시간을 제어합니다. ",
   "help_screenshot_title": "스크린샷 보호",

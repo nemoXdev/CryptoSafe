@@ -12,6 +12,8 @@
   "help_lock_permanent": "Passwort dauerhaft speichern (verschlüsselt im Keystore).",
   "help_app_lock_title": "App-Sperre (PIN + Fingerabdruck)",
   "help_app_lock_desc": "Das App-PIN wird mit Argon2id (64 MB Speicher) gehasht und in EncryptedSharedPreferences gespeichert. Es unterstützt Buchstaben, Zahlen und Symbole (4 bis 32 Zeichen). 5 Fehlversuche führen zu einer 30-sekündigen Sperre. Der Fingerabdruck nutzt Android BiometricPrompt. Ohne PIN hat jeder, der die App öffnet, vollen Zugriff.",
+  "help_backup_title": "Datensicherung schützen",
+  "help_backup_desc": "Das Festlegen eines PIN schützt Ihre Daten. Bei einem App-Fehler können Sie alle Ihre Daten wiederherstellen, indem Sie Ihren PIN eingeben. Ohne PIN können bei Fehlern Daten verloren gehen.",
   "help_auto_lock_title": "Auto-Sperr-Timer",
   "help_auto_lock_desc": "Legt fest, wie lange die App nach dem Minimieren entsperrt bleibt.",
   "help_screenshot_title": "Screenshot-Schutz",

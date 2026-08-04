@@ -12,6 +12,8 @@
   "help_lock_permanent": "永久记住密码（加密存储在密钥库中）。",
   "help_app_lock_title": "应用锁 (PIN + 指纹)",
   "help_app_lock_desc": "应用PIN使用Argon2id（64MB内存）进行哈希，并存储在EncryptedSharedPreferences中。支持字母、数字和符号（4至32个字符）。5次错误尝试会触发30秒锁定。指纹使用Android BiometricPrompt。没有PIN，任何打开应用的人都可以完全访问。",
+  "help_backup_title": "保护您的数据备份",
+  "help_backup_desc": "设置PIN码可以保护您的数据。如果应用出现问题，您可以通过输入PIN码恢复所有数据。没有PIN码，出现问题时数据可能会丢失。",
   "help_auto_lock_title": "自动锁定定时器",
   "help_auto_lock_desc": "控制应用程序最小化后保持解锁状态的时间。",
   "help_screenshot_title": "截图保护",

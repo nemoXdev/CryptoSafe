@@ -12,6 +12,8 @@
   "help_lock_permanent": "Lembre-se da senha permanentemente (armazenada criptografada no Keystore).",
   "help_app_lock_title": "Bloqueio do App (PIN + Impressão Digital)",
   "help_app_lock_desc": "O PIN do aplicativo é codificado com Argon2id (memória de 64MB) e armazenado em EncryptedSharedPreferences. Suporta letras, números e símbolos (de 4 a 32 caracteres). 5 tentativas erradas acionam um bloqueio de 30 segundos. A impressão digital usa o Android BiometricPrompt. Sem PIN, qualquer pessoa que abrir o aplicativo terá acesso total.",
+  "help_backup_title": "Proteja seu backup de dados",
+  "help_backup_desc": "Definir um PIN protege seus dados. Se o aplicativo tiver um problema, você pode recuperar todos os seus dados digitando seu PIN. Sem um PIN, os dados podem ser perdidos se algo der errado.",
   "help_auto_lock_title": "Temporizador de Bloqueio Automático",
   "help_auto_lock_desc": "Controle quanto tempo o aplicativo permanece desbloqueado após ser minimizado.",
   "help_screenshot_title": "Proteção de Screenshot",

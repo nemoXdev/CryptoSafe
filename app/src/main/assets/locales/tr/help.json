@@ -12,6 +12,8 @@
   "help_lock_permanent": "Şifreyi kalıcı olarak hatırla (Keystore'da şifrelenmiş olarak saklanır).",
   "help_app_lock_title": "Uygulama Kilidi (PIN + Parmak İzi)",
   "help_app_lock_desc": "Uygulama PIN'i Argon2id (64MB bellek) ile hashlenir ve EncryptedSharedPreferences içinde saklanır. Harfleri, sayıları ve sembolleri (4 ila 32 karakter) destekler. 5 hatalı deneme 30 saniyelik kilitlenmeye neden olur. Parmak izi Android BiometricPrompt kullanır. PIN olmadan uygulamayı açan herkes tam erişime sahiptir.",
+  "help_backup_title": "Veri Yedeklemenizi Koruyun",
+  "help_backup_desc": "PIN ayarlamak verilerinizi korur. Uygulamada bir sorun olursa, PIN'inizi girerek tüm verilerinizi kurtarabilirsiniz. PIN olmadan, bir şeyler ters giderse veriler kaybolabilir.",
   "help_auto_lock_title": "Otomatik Kilit Zamanlayıcısı",
   "help_auto_lock_desc": "Simge durumuna küçültüldükten sonra uygulamanın kilidinin ne kadar süreyle açık kalacağını kontrol eder. ",
   "help_screenshot_title": "Ekran Görüntüsü Koruması",

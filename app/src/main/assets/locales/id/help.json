@@ -12,6 +12,8 @@
   "help_lock_permanent": "Ingat kata sandi secara permanen (disimpan terenkripsi di Keystore).",
   "help_app_lock_title": "Kunci Aplikasi (PIN + Sidik Jari)",
   "help_app_lock_desc": "PIN aplikasi di-hash dengan Argon2id (memori 64MB) dan disimpan di EncryptedSharedPreferences. Mendukung huruf, angka, dan simbol (4 hingga 32 karakter). 5 percobaan salah memicu kunci selama 30 detik. Sidik jari menggunakan Android BiometricPrompt. Tanpa PIN, siapa pun yang membuka aplikasi memiliki akses penuh.",
+  "help_backup_title": "Lindungi Cadangan Data Anda",
+  "help_backup_desc": "Mengatur PIN melindungi data Anda. Jika aplikasi bermasalah, Anda dapat memulihkan semua data dengan memasukkan PIN Anda. Tanpa PIN, data mungkin hilang jika terjadi kesalahan.",
   "help_auto_lock_title": "Pengatur Waktu Kunci Otomatis",
   "help_auto_lock_desc": "Mengontrol berapa lama aplikasi tetap terbuka kuncinya setelah diminimalkan.",
   "help_screenshot_title": "Tangkapan Layar Perlindungan",

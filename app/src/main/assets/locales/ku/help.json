@@ -12,6 +12,8 @@
   "help_lock_permanent": "وشەی نهێنی بۆ هەمیشە لەبیرت بێت (بە کۆدکراو لە Keystore هەڵگیراوە).",
   "help_app_lock_title": "Qefilandina Appê (PIN + Şopa Tiliyê)",
   "help_app_lock_desc": "PIN-ی ئەپەکە بە Argon2id (بیرگە 64MB) هاش دەکرێت و لە EncryptedSharedPreferences هەڵدەگیرێت. پیتی، ژمارە و هێماکان (لە 4 بۆ 32 پیت) پشتگیری دەکات. 5 هەوڵی هەڵە دەبێتەهۆی قفڵی 30 چرکە. پەنجەمۆر Android BiometricPrompt بەکاردەهێنێت. بەبێ PIN، هەر کەسێک ئەپەکە بکاتەوە دەستگەیشتنی تەواو هەیە.",
+  "help_backup_title": "Panahîtiya Daneyan Parêzîn",
+  "help_backup_desc": "Danîna PIN sazkirin daneyan parêzî dike. Hekeêp problemê hebe, hûn dikarin hemû daneyan xwe bo vegertonan PIN binivê. Bêyî PIN, di kazyarî de daneyan dikenin.",
   "help_auto_lock_title": "Demjimêra Qefilandinê ya Otomatîk",
   "help_auto_lock_desc": "کۆنتڕۆڵی ئەوە دەکات کە ئەپەکە چەند کاتژمێر بەبێ قفڵ دەمێنێتەوە دوای کەمکردنەوەی. ",
   "help_screenshot_title": "Parastina Screenshot",

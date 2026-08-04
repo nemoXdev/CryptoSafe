@@ -134,6 +134,29 @@ fun HelpScreen() {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
+                    LocalizationManager.getString("help_backup_title"),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    LocalizationManager.getString("help_backup_desc"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    lineHeight = 22.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
                     LocalizationManager.getString("help_auto_lock_title"),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,

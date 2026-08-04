@@ -12,6 +12,8 @@
   "help_lock_permanent": "パスワードを永続的に記憶します (キーストアに暗号化して保存されます)。",
   "help_app_lock_title": "アプリロック (PIN + 指紋)",
   "help_app_lock_desc": "アプリのPINはArgon2id（64MBメモリ）でハッシュ化され、EncryptedSharedPreferencesに保存されます。文字、数字、記号（4〜32文字）に対応しています。5回の誤試行で30秒のロックアウトが発生します。指紋はAndroid BiometricPromptを使用します。PINがない場合、アプリを開いた人は誰でも完全にアクセスできます。",
+  "help_backup_title": "データバックアップを保護",
+  "help_backup_desc": "PINを設定するとデータが保護されます。アプリに問題が発生した場合、PINを入力してすべてのデータを復元できます。PINがない場合、問題が発生するとデータが失われる可能性があります。",
   "help_auto_lock_title": "オートロックタイマー",
   "help_auto_lock_desc": "アプリを最小化した後、ロックを解除したままにする時間を制御します。 ",
   "help_screenshot_title": "スクリーンショット保護",
