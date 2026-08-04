@@ -4,11 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import java.security.MessageDigest
+import com.cryptosafe.app.CryptoEngine
 import java.security.SecureRandom
-import javax.crypto.Cipher
-import javax.crypto.spec.GCMParameterSpec
-import javax.crypto.spec.SecretKeySpec
 
 object SecurePasswordStorage {
     private var prefs: SharedPreferences? = null
@@ -31,46 +28,57 @@ object SecurePasswordStorage {
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
-            syncBackupEncrypted()
             return
         } catch (e: Exception) {
+            // EncryptedSharedPreferences فشلت (جهاز به مشكلة نظام).
+            // نعود لملف عادي ولا نمسح أي شيء — القراءة من raw قد تعيد
+            // المفتاح الصحيح إذا كان قد حُفظ صريحاً من قبل.
             prefs = rawPrefs
 
-            val recovered = rawPrefs.getString("db_passphrase", null)
-            if (!recovered.isNullOrEmpty()) return
+            // علامة "fallback_plain" تعني أن المفتاح الموجود في raw كتبه كودنا
+            // كنص صريح، فهو موثوق. بدونها قد يكون الملف مكتوباً بواسطة ESP
+            // (قيمة مشفرة) فلا نثق به ونلجأ للنسخة الاحتياطية.
+            if (rawPrefs.getBoolean("fallback_plain", false)) {
+                val recovered = rawPrefs.getString("db_passphrase", null)
+                if (!recovered.isNullOrEmpty()) return
+            }
 
             val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null)
             if (!encryptedPass.isNullOrEmpty()) {
-                val rawPinHash = rawPrefs.getString("pin_hash", null)
-                if (!rawPinHash.isNullOrEmpty()) {
-                    try {
-                        val decrypted = decryptWithPin(encryptedPass, rawPinHash)
-                        rawPrefs.edit().putString("db_passphrase", decrypted).apply()
-                        return
-                    } catch (_: Exception) {}
-                }
                 isBackupAvailable = true
+                isPassphraseLost = true
+                return
             }
+
+            val recovered = rawPrefs.getString("db_passphrase", null)
+            if (!recovered.isNullOrEmpty()) return
 
             isPassphraseLost = true
         }
     }
 
-    private fun syncBackupEncrypted() {
+    // النسخة الاحتياطية تُنشأ من المفتاح الواضح + PIN النصي مباشرة،
+    // دون قراءة أي شيء من ESP — فهكذا تنجح حتى لو ESP معطوبة بالكامل.
+    fun savePin(pin: String) {
+        getPrefs().edit().putString("pin_hash", CryptoEngine.hashPin(pin)).apply()
+        syncBackupWithPin(pin)
+    }
+
+    private fun syncBackupWithPin(pin: String) {
         val passphrase = prefs?.getString("db_passphrase", null) ?: return
-        val pinHash = prefs?.getString("pin_hash", null) ?: return
         try {
-            val encrypted = encryptWithPin(passphrase, pinHash)
+            val encrypted = CryptoEngine.encrypt(passphrase, pin.toCharArray())
             backupPrefs?.edit()?.putString("db_passphrase_enc", encrypted)?.apply()
         } catch (_: Exception) {}
     }
 
+    // استرجاع المفتاح من النسخة الاحتياطية عبر PIN. ينجح حتى لو ESP معطوبة.
     fun recoverFromBackup(pin: String): Boolean {
         val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null) ?: return false
         return try {
-            val pinHash = hashPin(pin)
-            val decrypted = decryptWithPin(encryptedPass, pinHash)
+            val decrypted = CryptoEngine.decrypt(encryptedPass, pin.toCharArray())
             getPrefs().edit().putString("db_passphrase", decrypted).apply()
+            markPlainFallback()
             isPassphraseLost = false
             isBackupAvailable = false
             true
@@ -79,35 +87,16 @@ object SecurePasswordStorage {
         }
     }
 
-    private fun hashPin(pin: String): String {
-        val md = MessageDigest.getInstance("SHA-256")
-        return md.digest(pin.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
-    }
-
-    private fun getPrefs(): SharedPreferences {
-        return prefs ?: throw IllegalStateException("SecurePasswordStorage not initialized")
-    }
-
-    private fun encryptWithPin(plaintext: String, pinHash: String): String {
-        val keyBytes = pinHash.toByteArray(Charsets.UTF_8).copyOf(32)
-        val key = SecretKeySpec(keyBytes, "AES")
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        val iv = ByteArray(12)
-        SecureRandom().nextBytes(iv)
-        cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(128, iv))
-        val encrypted = cipher.doFinal(plaintext.toByteArray(Charsets.UTF_8))
-        return android.util.Base64.encodeToString(iv + encrypted, android.util.Base64.NO_WRAP)
-    }
-
-    private fun decryptWithPin(encryptedBase64: String, pinHash: String): String {
-        val keyBytes = pinHash.toByteArray(Charsets.UTF_8).copyOf(32)
-        val key = SecretKeySpec(keyBytes, "AES")
-        val combined = android.util.Base64.decode(encryptedBase64, android.util.Base64.NO_WRAP)
-        val iv = combined.copyOfRange(0, 12)
-        val encrypted = combined.copyOfRange(12, combined.size)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(128, iv))
-        return String(cipher.doFinal(encrypted), Charsets.UTF_8)
+    // تحقق فقط من صحة PIN مقابل الاحتياطي، دون حفظ أي شيء
+    // (تُستخدم لتأكيد الحذف النهائي قبل تنفيذه).
+    fun isBackupPinValid(pin: String): Boolean {
+        val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null) ?: return false
+        return try {
+            CryptoEngine.decrypt(encryptedPass, pin.toCharArray())
+            true
+        } catch (_: Exception) {
+            false
+        }
     }
 
     fun hasPin(): Boolean {
@@ -116,11 +105,7 @@ object SecurePasswordStorage {
 
     fun removePinHash() {
         getPrefs().edit().remove("pin_hash").apply()
-    }
-
-    fun savePinHash(pinHash: String) {
-        getPrefs().edit().putString("pin_hash", pinHash).apply()
-        syncBackupEncrypted()
+        backupPrefs?.edit()?.remove("db_passphrase_enc")?.apply()
     }
 
     fun getPinHash(): String? {
@@ -165,7 +150,14 @@ object SecurePasswordStorage {
 
     fun saveDatabasePassphrase(passphrase: String) {
         getPrefs().edit().putString("db_passphrase", passphrase).apply()
-        syncBackupEncrypted()
+        markPlainFallback()
+    }
+
+    // تُكتب العلامة فقط عندما نكتب المفتاح بأنفسنا في وضع الـ fallback،
+    // لتأكيد أن قيمة db_passphrase في raw هي نص صريح موثوق.
+    private fun markPlainFallback() {
+        if (prefs == null) return
+        getPrefs().edit().putBoolean("fallback_plain", true).apply()
     }
 
     fun clearDatabasePassphrase() {
@@ -176,6 +168,11 @@ object SecurePasswordStorage {
     fun getOrCreateDatabasePassphrase(): ByteArray {
         val existing = getDatabasePassphrase()
         if (existing != null && existing.isNotEmpty()) return existing
+        // يوجد احتياطي بانتظار الاسترجاع — لا ننشئ مفتاحاً جديداً أبداً
+        // وإلا تعذّر فتح القاعدة القديمة وتضيع البيانات للأبد.
+        if (isBackupAvailable) {
+            throw IllegalStateException("db_passphrase_lost_recovery_required")
+        }
         val bytes = ByteArray(32)
         SecureRandom().nextBytes(bytes)
         val passphrase = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
@@ -221,5 +218,9 @@ object SecurePasswordStorage {
 
     fun setLockedOnExit(locked: Boolean) {
         getPrefs().edit().putBoolean("locked_on_exit", locked).apply()
+    }
+
+    private fun getPrefs(): SharedPreferences {
+        return prefs ?: throw IllegalStateException("SecurePasswordStorage not initialized")
     }
 }

@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -809,6 +810,9 @@ private fun DatabaseErrorScreen(
     var pinInput by remember { mutableStateOf("") }
     var pinError by remember { mutableStateOf(false) }
     var isRecovering by remember { mutableStateOf(false) }
+    var showResetConfirm by remember { mutableStateOf(false) }
+    var resetPin by remember { mutableStateOf("") }
+    var resetPinError by remember { mutableStateOf(false) }
 
     Surface(modifier = Modifier.fillMaxSize(), color = Color.Black) {
         Column(
@@ -935,7 +939,7 @@ private fun DatabaseErrorScreen(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Button(
-                onClick = onReset,
+                onClick = { showResetConfirm = true },
                 modifier = Modifier.fillMaxWidth().height(48.dp),
                 shape = MaterialTheme.shapes.medium,
                 colors = ButtonDefaults.buttonColors(
@@ -949,5 +953,75 @@ private fun DatabaseErrorScreen(
                 Text(LocalizationManager.getString("db_error_exit"))
             }
         }
+    }
+
+    if (showResetConfirm) {
+        val backupAvailable = isBackupAvailable
+        AlertDialog(
+            onDismissRequest = {
+                showResetConfirm = false
+                resetPin = ""
+                resetPinError = false
+            },
+            title = {
+                Text(LocalizationManager.getString("reset_confirm_title"))
+            },
+            text = {
+                if (backupAvailable) {
+                    Column {
+                        Text(LocalizationManager.getString("reset_enter_pin"))
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = resetPin,
+                            onValueChange = {
+                                resetPin = it
+                                resetPinError = false
+                            },
+                            label = { Text(LocalizationManager.getString("pin")) },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                            visualTransformation = PasswordVisualTransformation(),
+                            isError = resetPinError,
+                            supportingText = if (resetPinError) {
+                                { Text(LocalizationManager.getString("pin_wrong"), color = MaterialTheme.colorScheme.error) }
+                            } else null,
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true
+                        )
+                    }
+                } else {
+                    Text(LocalizationManager.getString("reset_confirm_message"))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (backupAvailable) {
+                        if (resetPin.isEmpty()) return@TextButton
+                        if (SecurePasswordStorage.isBackupPinValid(resetPin)) {
+                            showResetConfirm = false
+                            onReset()
+                        } else {
+                            resetPinError = true
+                        }
+                    } else {
+                        showResetConfirm = false
+                        onReset()
+                    }
+                }) {
+                    Text(
+                        LocalizationManager.getString("reset_delete"),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showResetConfirm = false
+                    resetPin = ""
+                    resetPinError = false
+                }) {
+                    Text(LocalizationManager.getString("cancel"))
+                }
+            }
+        )
     }
 }

@@ -210,7 +210,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
                         Toast.makeText(context, LocalizationManager.getString("pins_do_not_match"), Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-                    SecurePasswordStorage.savePinHash(CryptoEngine.hashPin(newPin))
+                    SecurePasswordStorage.savePin(newPin)
                     SecurePasswordStorage.setPinAttempts(0)
                     Toast.makeText(context, LocalizationManager.getString("pin_set_success"), Toast.LENGTH_SHORT).show()
                     newPin = ""
@@ -278,7 +278,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
                         Toast.makeText(context, LocalizationManager.getString("pins_do_not_match"), Toast.LENGTH_SHORT).show()
                         return@Button
                     }
-                    SecurePasswordStorage.savePinHash(CryptoEngine.hashPin(newPin))
+                    SecurePasswordStorage.savePin(newPin)
                     SecurePasswordStorage.setPinAttempts(0)
                     Toast.makeText(context, LocalizationManager.getString("pin_changed_success"), Toast.LENGTH_SHORT).show()
                     currentPin = ""
