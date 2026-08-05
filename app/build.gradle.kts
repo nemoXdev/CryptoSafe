@@ -15,7 +15,7 @@ android {
         applicationId = "com.cryptosafe.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 8
+        versionCode = 9
         versionName = "2.0.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
