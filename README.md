@@ -133,8 +133,9 @@ The APK checksums are signed with my PGP key, which is available on public keyse
 gpg --keyserver hkps://keyserver.ubuntu.com --recv-keys B735DBF5C0A886A4
 ```
 ```
-Fingerprint: "4BCC F36B C56D F0E0 AEB5 C758 B735 DBF5 C0A8 86A4"
-Email: nemoXdev <140950079+nemoXdev@users.noreply.github.com>
+Fingerprint: `4BCC F36B C56D F0E0 AEB5 C758 B735 DBF5 C0A8 86A4`
+Direct Contact: `nemoXdev@proton.me`
+Git & APK Signing: `140950079+nemoXdev@users.noreply.github.com`
 ```
 To verify the APK checksums, save the PGP-signed message to a file and run:
 ```
