@@ -20,8 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.LockOpen
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +41,7 @@ import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.R
+import com.cryptosafe.app.components.FlashButton
 import com.cryptosafe.app.components.InputCard
 import com.cryptosafe.app.components.OutputCard
 import com.cryptosafe.app.components.PasswordStrengthCard
@@ -80,31 +79,31 @@ fun HomeButtons(onEncrypt: () -> Unit, onDecrypt: () -> Unit) {
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.8f)
             )
             Spacer(modifier = Modifier.height(48.dp))
-            Button(
-                onClick = onEncrypt,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(Icons.Default.Lock, null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(LocalizationManager.getString("encrypt_button"), fontSize = 18.sp)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onDecrypt,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-            ) {
-                Icon(Icons.Default.LockOpen, null, modifier = Modifier.size(24.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(LocalizationManager.getString("decrypt_button"), fontSize = 18.sp)
-            }
+        FlashButton(
+            onClick = onEncrypt,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            cornerRadius = 12.dp
+        ) {
+            Icon(Icons.Default.Lock, null, modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(LocalizationManager.getString("encrypt_button"), fontSize = 18.sp)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        FlashButton(
+            onClick = onDecrypt,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(60.dp),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            cornerRadius = 12.dp
+        ) {
+            Icon(Icons.Default.LockOpen, null, modifier = Modifier.size(24.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(LocalizationManager.getString("decrypt_button"), fontSize = 18.sp)
+        }
         }
     }
 }
@@ -145,11 +144,11 @@ fun EncryptScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        FlashButton(
             onClick = {
                 if (inputText.isBlank()) {
                     Toast.makeText(context, LocalizationManager.getString("input_text"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
 
                 onStartLoading()
@@ -175,8 +174,8 @@ fun EncryptScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            containerColor = MaterialTheme.colorScheme.primary,
+            cornerRadius = 8.dp,
             enabled = !isLoading && password.isNotEmpty() && password.size < 1000
         ) {
             if (isLoading) {

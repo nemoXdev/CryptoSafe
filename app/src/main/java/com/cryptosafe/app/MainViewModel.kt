@@ -76,7 +76,8 @@ class MainViewModel : ViewModel() {
     
     fun navigateBack() {
         when (mode) {
-            Screen.Encrypt, Screen.Decrypt, Screen.About, Screen.Settings -> goHome()
+            Screen.Encrypt, Screen.Decrypt, Screen.About -> goHome()
+            Screen.Settings -> if (selectedTab == 1) goBoxes() else goHome()
             Screen.Help -> goSettings()
             Screen.CreateBox -> goBoxes()
             Screen.Chat, Screen.BoxSettings -> {

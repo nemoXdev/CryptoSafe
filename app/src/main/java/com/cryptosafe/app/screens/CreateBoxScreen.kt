@@ -15,8 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -45,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
+import com.cryptosafe.app.components.FlashButton
 import com.cryptosafe.app.components.RandomNameButton
 import com.cryptosafe.app.data.AppDatabase
 import com.cryptosafe.app.data.Box
@@ -87,7 +86,6 @@ fun CreateBoxScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
-    var showConfirmPassword by remember { mutableStateOf(false) }
     var autoDeleteHours by remember { mutableIntStateOf(0) }
     var lockMode by remember { mutableStateOf("always") }
     var lockTimeoutMinutes by remember { mutableIntStateOf(5) }
@@ -172,12 +170,7 @@ fun CreateBoxScreen(
             onValueChange = { confirmPassword = it },
             label = { Text(LocalizationManager.getString("confirm_password")) },
             modifier = Modifier.fillMaxWidth(),
-            visualTransformation = if (showConfirmPassword) VisualTransformation.None else PasswordVisualTransformation(),
-            trailingIcon = {
-                IconButton(onClick = { showConfirmPassword = !showConfirmPassword }) {
-                    Icon(if (showConfirmPassword) Icons.Default.Visibility else Icons.Default.VisibilityOff, null)
-                }
-            },
+            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             singleLine = true,
             shape = MaterialTheme.shapes.small,
@@ -284,23 +277,19 @@ fun CreateBoxScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        FlashButton(
             onClick = {
                 if (boxName.isBlank()) {
                     Toast.makeText(context, LocalizationManager.getString("enter_box_name"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
-                if (password.length < 8) {
+                if (password.length < 4) {
                     Toast.makeText(context, LocalizationManager.getString("password_too_short"), Toast.LENGTH_SHORT).show()
-                    return@Button
-                }
-                if (CryptoEngine.checkPasswordStrength(password.toCharArray()).second == "weak") {
-                    Toast.makeText(context, LocalizationManager.getString("password_too_weak"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
                 if (password != confirmPassword) {
                     Toast.makeText(context, LocalizationManager.getString("passwords_do_not_match"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
 
                 scope.launch(Dispatchers.IO) {
@@ -334,8 +323,8 @@ fun CreateBoxScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = MaterialTheme.shapes.medium,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            containerColor = MaterialTheme.colorScheme.primary,
+            cornerRadius = 12.dp
         ) {
             Text(LocalizationManager.getString("create_box"), fontWeight = FontWeight.Medium, fontSize = 16.sp)
         }

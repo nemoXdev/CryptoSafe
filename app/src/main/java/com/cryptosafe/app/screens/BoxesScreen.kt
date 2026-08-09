@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +21,6 @@ import androidx.compose.material.icons.filled.Inbox
 
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.LocalizationManager
+import com.cryptosafe.app.components.FlashButton
 import com.cryptosafe.app.data.AppDatabase
 import com.cryptosafe.app.data.Box
 import com.cryptosafe.app.data.BoxWithCount
@@ -126,13 +127,15 @@ private fun BoxWithContent(
             }
         }
 
-        FloatingActionButton(
+        FlashButton(
             onClick = onCreateBox,
             modifier = Modifier
                 .align(Alignment.End)
-                .padding(16.dp),
-            shape = RoundedCornerShape(16.dp),
-            containerColor = MaterialTheme.colorScheme.primary
+                .padding(16.dp)
+                .size(56.dp),
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentPadding = PaddingValues(0.dp),
+            cornerRadius = 16.dp
         ) {
             Icon(Icons.Default.Add, LocalizationManager.getString("create_box"))
         }

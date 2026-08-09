@@ -19,8 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +43,7 @@ import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.InputCard
 import com.cryptosafe.app.components.OutputCard
+import com.cryptosafe.app.components.FlashButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -107,15 +106,15 @@ fun DecryptScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
+        FlashButton(
             onClick = {
                 if (inputText.isBlank()) {
                     Toast.makeText(context, LocalizationManager.getString("input_text"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
                 if (password.isEmpty()) {
                     Toast.makeText(context, LocalizationManager.getString("password_required"), Toast.LENGTH_SHORT).show()
-                    return@Button
+                    return@FlashButton
                 }
 
                 onStartLoading()
@@ -141,8 +140,8 @@ fun DecryptScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
-            shape = MaterialTheme.shapes.small,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary),
+            containerColor = MaterialTheme.colorScheme.secondary,
+            cornerRadius = 8.dp,
             enabled = !isLoading
         ) {
             if (isLoading) {

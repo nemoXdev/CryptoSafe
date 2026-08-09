@@ -13,12 +13,11 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import com.cryptosafe.app.components.FlashButton
+import com.cryptosafe.app.components.FlatDialog
 import com.cryptosafe.app.components.PasswordDialog
 import com.cryptosafe.app.components.RandomNameButton
 import com.cryptosafe.app.components.SafePasswordField
-import com.cryptosafe.app.components.FlatDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
@@ -138,7 +137,7 @@ fun BoxSettingsScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Button(
+                FlashButton(
                     onClick = {
                         if (boxName.isNotBlank() && boxName != box.name) {
                             scope.launch(Dispatchers.IO) {
@@ -150,7 +149,8 @@ fun BoxSettingsScreen(
                         }
                     },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = MaterialTheme.shapes.small,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    cornerRadius = 8.dp,
                     enabled = boxName.isNotBlank() && boxName != box.name
                 ) {
                     Text(LocalizationManager.getString("rename_box"))
@@ -175,10 +175,11 @@ fun BoxSettingsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Button(
+                FlashButton(
                     onClick = { showPasswordChangeDialog = true },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
-                    shape = MaterialTheme.shapes.small
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    cornerRadius = 8.dp
                 ) {
                     Text(LocalizationManager.getString("change_box_password"))
                 }
@@ -339,11 +340,11 @@ fun BoxSettingsScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(
+        FlashButton(
             onClick = { showDeleteDialog = true },
             modifier = Modifier.fillMaxWidth().height(52.dp),
-            shape = MaterialTheme.shapes.medium,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            containerColor = MaterialTheme.colorScheme.error,
+            cornerRadius = 12.dp
         ) {
             Text(LocalizationManager.getString("delete_box"), fontWeight = FontWeight.Medium, fontSize = 16.sp)
         }
@@ -418,10 +419,8 @@ fun ChangeBoxPasswordDialog(
             when {
                 !CryptoEngine.verifyPasswordForStorage(currentPassword, box.passwordHash) ->
                     Toast.makeText(context, LocalizationManager.getString("wrong_password"), Toast.LENGTH_SHORT).show()
-                newPassword.length < 8 ->
+                newPassword.length < 4 ->
                     Toast.makeText(context, LocalizationManager.getString("password_too_short"), Toast.LENGTH_SHORT).show()
-                CryptoEngine.checkPasswordStrength(newPassword.toCharArray()).second == "weak" ->
-                    Toast.makeText(context, LocalizationManager.getString("password_too_weak"), Toast.LENGTH_SHORT).show()
                 newPassword != confirmPassword ->
                     Toast.makeText(context, LocalizationManager.getString("passwords_do_not_match"), Toast.LENGTH_SHORT).show()
                 else -> {

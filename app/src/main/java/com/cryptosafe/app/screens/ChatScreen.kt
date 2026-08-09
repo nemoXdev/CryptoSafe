@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
+import com.cryptosafe.app.components.FlashButton
 import com.cryptosafe.app.data.AppDatabase
 import com.cryptosafe.app.data.Box
 import com.cryptosafe.app.data.Message
@@ -396,9 +398,9 @@ fun ChatScreen(
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
-            IconButton(
+            FlashButton(
                 onClick = {
-                    if (inputText.isBlank()) return@IconButton
+                    if (inputText.isBlank()) return@FlashButton
                     val textToSend = inputText
                     inputText = ""
                     val passChars = boxPassword.toCharArray()
@@ -427,7 +429,11 @@ fun ChatScreen(
                         }
                     }
                 },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
+                containerColor = Color.Transparent,
+                contentPadding = PaddingValues(0.dp),
+                cornerRadius = 24.dp,
+                flashColor = MaterialTheme.colorScheme.primary
             ) {
                 Icon(
                     Icons.Default.Send,
