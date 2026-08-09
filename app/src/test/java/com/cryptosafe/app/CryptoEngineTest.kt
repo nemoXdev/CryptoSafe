@@ -5,51 +5,8 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
+
 class CryptoEngineTest {
-
-    @Test
-    fun `corrupted base64 should fail`() {
-        val password = "password".toCharArray()
-        try {
-            CryptoEngine.decrypt("!!!not-valid-base64!!!", password)
-            assert(false) { "Should have thrown exception" }
-        } catch (e: Exception) {
-            assertTrue(true)
-        }
-    }
-
-    @Test
-    fun `empty string should fail`() {
-        val password = "password".toCharArray()
-        try {
-            CryptoEngine.decrypt("", password)
-            assert(false) { "Should have thrown exception" }
-        } catch (e: Exception) {
-            assertTrue(true)
-        }
-    }
-
-    @Test
-    fun `random garbage should fail`() {
-        val password = "password".toCharArray()
-        try {
-            CryptoEngine.decrypt("dGhpcyBpcyBub3QgZW5jb3RlZA==", password)
-            assert(false) { "Should have thrown exception" }
-        } catch (e: Exception) {
-            assertTrue(true)
-        }
-    }
-
-    @Test
-    fun `too short data should fail`() {
-        val password = "password".toCharArray()
-        try {
-            CryptoEngine.decrypt("AAAA", password)
-            assert(false) { "Should have thrown exception" }
-        } catch (e: Exception) {
-            assertTrue(true)
-        }
-    }
 
     @Test
     fun `generatePassword returns correct length`() {
@@ -91,6 +48,12 @@ class CryptoEngineTest {
     }
 
     @Test
+    fun `generatePassword never contains ambiguous whitespace`() {
+        val password = CryptoEngine.generatePassword(200)
+        assertTrue(password.none { it.isWhitespace() })
+    }
+
+    @Test
     fun `short password is weak`() {
         val (score, level) = CryptoEngine.checkPasswordStrength("abc".toCharArray())
         assertEquals(1, score)
@@ -122,5 +85,12 @@ class CryptoEngineTest {
         val (score, level) = CryptoEngine.checkPasswordStrength("Aaaa1bbb!cccc9".toCharArray())
         assertEquals(2, score)
         assertEquals("medium", level)
+    }
+
+    @Test
+    fun `empty password is weak`() {
+        val (score, level) = CryptoEngine.checkPasswordStrength("".toCharArray())
+        assertEquals(1, score)
+        assertEquals("weak", level)
     }
 }

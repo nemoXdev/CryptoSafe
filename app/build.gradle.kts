@@ -4,6 +4,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose") version "2.1.0"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -14,8 +15,19 @@ android {
         applicationId = "com.cryptosafe.app"
         minSdk = 24
         targetSdk = 35
-        versionCode = 7
-        versionName = "1.3.0"
+        versionCode = 9
+        versionName = "2.1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     signingConfigs {
@@ -114,6 +126,31 @@ dependencies {
     implementation("com.lambdapioneer.argon2kt:argon2kt:1.6.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation("androidx.test:core-ktx:1.6.1")
+
+    androidTestImplementation("androidx.test:runner:1.6.2")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test:core-ktx:1.6.1")
+
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    ksp("androidx.room:room-compiler:2.6.1")
+
+    implementation("net.zetetic:sqlcipher-android:4.16.0")
+    implementation("androidx.sqlite:sqlite:2.6.2")
+
+    
+    
+    implementation("androidx.security:security-crypto:1.1.0")
+
+    implementation("androidx.biometric:biometric:1.1.0")
+
+    implementation("androidx.fragment:fragment-ktx:1.8.5")
+
+    implementation("androidx.lifecycle:lifecycle-process:2.8.7")
+
+    implementation("androidx.work:work-runtime-ktx:2.10.0")
 
     configurations.all {
         exclude(group = "io.opencensus")

@@ -1,1 +1,1 @@
-Criptografia de texto AES-256 militar offline
+Criptografia de texto AES-256-GCM offline com Argon2id, sem internet

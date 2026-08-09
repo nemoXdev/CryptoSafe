@@ -5,12 +5,21 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
 
 object LocalizationManager {
     private var prefs: SharedPreferences? = null
-    private var translations = mutableMapOf<String, JSONObject>()
+    private var appContext: Context? = null
+    private val translations = mutableMapOf<String, JSONObject>()
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val allLocales = listOf(
+        "en", "ar", "fr", "es", "de", "zh", "pt", "fa", "ku", "hi", "tr", "ru", "id", "ko", "ja"
+    )
     var currentLocale by mutableStateOf("en")
         private set
     val isRtl: Boolean
@@ -18,48 +27,61 @@ object LocalizationManager {
 
     fun initialize(context: Context) {
         prefs = context.getSharedPreferences("cryptosafe_prefs", Context.MODE_PRIVATE)
-        loadLocale(context, "en")
-        loadLocale(context, "ar")
-        loadLocale(context, "fr")
-        loadLocale(context, "es")
-        loadLocale(context, "de")
-        loadLocale(context, "zh")
-        loadLocale(context, "pt")
-        loadLocale(context, "fa")
-        loadLocale(context, "ku")
-        loadLocale(context, "hi")
-        loadLocale(context, "tr")
-        loadLocale(context, "ru")
-        loadLocale(context, "id")
-        loadLocale(context, "ko")
-        loadLocale(context, "ja")
+        appContext = context.applicationContext
 
         val saved = prefs?.getString("locale", null)
-        if (saved != null && translations.containsKey(saved)) {
-            currentLocale = saved
-        } else {
-            val deviceLang = context.resources.configuration.locales[0].language
-            currentLocale = if (translations.containsKey(deviceLang)) deviceLang else "en"
+        val deviceLang = context.resources.configuration.locales[0].language
+        val active = when {
+            saved != null && saved in allLocales -> saved
+            deviceLang in allLocales -> deviceLang
+            else -> "en"
+        }
+
+        
+        
+        loadLocale(context, active)
+        currentLocale = active
+
+        val remaining = allLocales - active
+        backgroundScope.launch(Dispatchers.IO) {
+            remaining.forEach { loadLocale(context, it) }
         }
     }
 
+    @Synchronized
     private fun loadLocale(context: Context, locale: String) {
         try {
-            val inputStream = context.assets.open("locales/$locale.json")
-            val json = inputStream.bufferedReader().use { it.readText() }
-            translations[locale] = JSONObject(json)
+            if (translations.containsKey(locale)) return
+            val combined = JSONObject()
+            val files = context.assets.list("locales/$locale") ?: return
+            for (file in files) {
+                if (!file.endsWith(".json")) continue
+                val inputStream = context.assets.open("locales/$locale/$file")
+                val json = inputStream.bufferedReader().use { it.readText() }
+                val obj = JSONObject(json)
+                val keys = obj.keys()
+                while (keys.hasNext()) {
+                    val key = keys.next()
+                    combined.put(key, obj.get(key))
+                }
+            }
+            translations[locale] = combined
         } catch (e: IOException) {
             e.printStackTrace()
         }
     }
 
     fun setLocale(locale: String) {
-        if (translations.containsKey(locale)) {
+        if (locale in allLocales) {
+            if (!translations.containsKey(locale)) {
+                appContext?.let { loadLocale(it, locale) }
+            }
             currentLocale = locale
             prefs?.edit()?.putString("locale", locale)?.apply()
         }
     }
 
+    @Synchronized
     fun getString(key: String): String {
         return try {
             translations[currentLocale]?.getString(key) ?: key
@@ -68,7 +90,7 @@ object LocalizationManager {
         }
     }
 
-    fun getAvailableLocales(): List<String> = translations.keys.toList()
+    fun getAvailableLocales(): List<String> = allLocales
 
     fun getLocaleDisplayName(code: String): String = when (code) {
         "en" -> "English"

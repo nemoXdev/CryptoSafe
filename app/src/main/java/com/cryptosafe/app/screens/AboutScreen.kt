@@ -1,7 +1,5 @@
 package com.cryptosafe.app.screens
 
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,8 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Code
@@ -27,13 +25,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cryptosafe.app.BuildConfig
@@ -42,24 +38,28 @@ import com.cryptosafe.app.R
 
 @Composable
 fun AboutScreen() {
-    val context = LocalContext.current
-
     val developerLink = "https://github.com/nemoXdev"
     val sourceCodeLink = "https://github.com/nemoXdev/CryptoSafe"
     val annotatedDeveloperText = buildAnnotatedString {
         append(LocalizationManager.getString("developer") + ": ")
-        pushStringAnnotation(tag = "URL", annotation = developerLink)
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline)) {
-            append("NemoXdev")
-        }
+        pushLink(
+            LinkAnnotation.Url(
+                url = developerLink,
+                styles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline))
+            )
+        )
+        append("NemoXdev")
         pop()
     }
     val annotatedSourceCodeText = buildAnnotatedString {
         append(LocalizationManager.getString("source_code") + ": ")
-        pushStringAnnotation(tag = "URL", annotation = sourceCodeLink)
-        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline)) {
-            append("GitHub")
-        }
+        pushLink(
+            LinkAnnotation.Url(
+                url = sourceCodeLink,
+                styles = TextLinkStyles(style = SpanStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Medium, textDecoration = TextDecoration.Underline))
+            )
+        )
+        append("GitHub")
         pop()
     }
 
@@ -67,16 +67,16 @@ fun AboutScreen() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -93,7 +93,7 @@ fun AboutScreen() {
                 Text(
                     LocalizationManager.getString("version") + " " + BuildConfig.VERSION_NAME,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
                 )
             }
         }
@@ -102,10 +102,10 @@ fun AboutScreen() {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     LocalizationManager.getString("whats_new_title"),
                     style = MaterialTheme.typography.titleMedium,
@@ -125,10 +125,10 @@ fun AboutScreen() {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     LocalizationManager.getString("how_to_use_title"),
                     style = MaterialTheme.typography.titleMedium,
@@ -148,10 +148,10 @@ fun AboutScreen() {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     LocalizationManager.getString("disclaimer_title"),
                     style = MaterialTheme.typography.titleMedium,
@@ -171,10 +171,10 @@ fun AboutScreen() {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
+            shape = MaterialTheme.shapes.medium,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column(modifier = Modifier.padding(16.dp)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -187,17 +187,9 @@ fun AboutScreen() {
                         tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    ClickableText(
+                    Text(
                         text = annotatedDeveloperText,
-                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-                        onClick = { offset ->
-                            annotatedDeveloperText
-                                .getStringAnnotations(tag = "URL", start = offset, end = offset)
-                                .firstOrNull()
-                                ?.let { annotation ->
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item)))
-                                }
-                        }
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -213,17 +205,9 @@ fun AboutScreen() {
                         tint = MaterialTheme.colorScheme.secondary
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    ClickableText(
+                    Text(
                         text = annotatedSourceCodeText,
-                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-                        onClick = { offset ->
-                            annotatedSourceCodeText
-                                .getStringAnnotations(tag = "URL", start = offset, end = offset)
-                                .firstOrNull()
-                                ?.let { annotation ->
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item)))
-                                }
-                        }
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }

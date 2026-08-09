@@ -40,6 +40,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +50,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -61,6 +60,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import kotlin.math.roundToInt
@@ -74,7 +74,7 @@ fun PasswordStrengthCard(
     strength: Pair<Int, String>
 ) {
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
     val prefs = remember { context.getSharedPreferences("password_prefs", android.content.Context.MODE_PRIVATE) }
     var passwordLength by remember { mutableFloatStateOf(prefs.getInt("length", 16).toFloat()) }
     fun savePrefs() { prefs.edit().apply { putInt("length", passwordLength.toInt()); apply() } }
@@ -127,18 +127,18 @@ fun PasswordStrengthCard(
                 trackColor = strengthColor.copy(alpha = 0.2f)
             )
             Row(modifier = Modifier.fillMaxWidth().padding(top = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(LocalizationManager.getString("count") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(LocalizationManager.getString("count") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
                 val isOverLimit = password.size >= 999
                 val countColor = if (isOverLimit) Color(0xFFCF6679) else Color(0xFF2196F3)
                 Text("${password.size}", style = MaterialTheme.typography.labelSmall, color = countColor, fontWeight = FontWeight.Medium)
             }
             Row(modifier = Modifier.fillMaxWidth().padding(top = 2.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(LocalizationManager.getString("password_strength") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                Text(LocalizationManager.getString("password_strength") + ":", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
                 Text(LocalizationManager.getString(strength.second), style = MaterialTheme.typography.labelSmall, color = strengthColor, fontWeight = FontWeight.Medium)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Text(LocalizationManager.getString("length") + ": ${passwordLength.toInt()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+            Text(LocalizationManager.getString("length") + ": ${passwordLength.toInt()}", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f))
             Spacer(modifier = Modifier.height(4.dp))
 
             val minVal = 8f
@@ -214,7 +214,7 @@ fun PasswordStrengthCard(
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 listOf(8, 16, 32, 64, 96, 120).forEach { len ->
-                    Text("$len", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f), modifier = Modifier.clickable { passwordLength = len.toFloat(); savePrefs() })
+                    Text("$len", fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f), modifier = Modifier.clickable { passwordLength = len.toFloat(); savePrefs() })
                 }
             }
 
@@ -223,7 +223,14 @@ fun PasswordStrengthCard(
                 Button(onClick = { onPasswordChange(CryptoEngine.generatePassword(length = passwordLength.toInt()).toCharArray()) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
                     Icon(Icons.Default.Casino, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(modifier = Modifier.width(6.dp)); Text(LocalizationManager.getString("generate_password"), fontSize = 13.sp)
                 }
-                Button(onClick = { if (password.isNotEmpty()) { clipboard.setText(AnnotatedString(String(password))); Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show() } }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                Button(onClick = {
+                    if (password.isNotEmpty()) {
+                        val text = String(password)
+                        ClipboardHelper.copySensitive(context, text) {
+                            Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(modifier = Modifier.width(6.dp)); Text(LocalizationManager.getString("copy"), fontSize = 13.sp)
                 }
             }

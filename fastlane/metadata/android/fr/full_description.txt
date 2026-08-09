@@ -1,9 +1,17 @@
-CryptoSafe est une application Android légère et hors ligne pour le chiffrement de texte de qualité militaire. Vos données ne quittent jamais votre appareil.
+CryptoSafe est une application entièrement hors ligne pour chiffrer et déchiffrer du texte. Elle n'utilise pas du tout Internet et tout reste sur votre téléphone.
 
 Fonctionnalités :
-• Chiffrement fort : AES-256-GCM avec dérivation de clé Argon2id (128 MiB, 4 itérations)
-• 100 % hors ligne : aucune permission Internet nécessaire
-• Capture d'écran bloquée : FLAG_SECURE empêche les fuites accidentelles
-• Zéro stockage : aucun journal, cache ou base de données
-• Interface moderne : Material 3 avec thème sombre
-• Copier et effacer en un tap
+• Boîtes anonymes : discutez dans des boîtes protégées par mot de passe, chacune avec son propre mot de passe
+• Chiffrement fort : AES-256-GCM avec dérivation de clé Argon2id
+• Verrouillage de l'application : code PIN et empreinte digitale avec minuterie de verrouillage automatique
+• Base de données chiffrée (SQLCipher) : rien n'est stocké en clair
+• Partager vers une boîte : recevez des textes chiffrés depuis WhatsApp, Telegram et d'autres applications directement dans une boîte
+• Partager depuis une boîte : partagez des textes chiffrés depuis une boîte de messages avec d'autres applications
+• Suppression automatique des messages (1 heure à 90 jours)
+• Modes de verrouillage des boîtes : demander à chaque fois, mémoriser un moment, garder pour la session ou mémoriser en permanence
+• Générateur de mots de passe intégré avec indicateur de robustesse
+• Protection contre les captures d'écran sur tous les écrans
+• Écran d'aide et de guide avec documentation détaillée
+• Traduit en 15 langues
+
+Aidez-nous à nous améliorer : signalez des problèmes ou suggérez des fonctionnalités sur https://github.com/nemoXdev/CryptoSafe/issues, ou contribuez aux traductions sur https://github.com/nemoXdev/CryptoSafe/blob/develop/app/src/main/assets/locales/README.md. Avec votre contribution, l'application s'améliore sans cesse.

@@ -2,9 +2,13 @@
 
 ## How to Add a New Language
 
-### Step 1: Create the translation file
-Create `{code}.json` in this directory (e.g. `de.json` for German).
-Copy the structure from `en.json` and translate all values.
+### Step 1: Create translation files
+Create a directory `{code}/` (e.g. `de/` for German) with these files:
+- `main.json` — UI strings (160 keys)
+- `help.json` — Help screen content (33 keys)
+- `about.json` — About screen content (10 keys)
+
+Copy the structure from the `en/` directory and translate all values.
 
 ### Step 2: Register the language in code
 Open `LocalizationManager.kt` and:
@@ -19,7 +23,7 @@ loadLocale(context, "de")
 "de" -> "Deutsch"
 ```
 
-That's it. The language menu, device detection, and persistence work automatically.
+That's it. The language menu, device detection, and persistence work automatically. New `.json` files added to the language directory are loaded automatically — no code changes needed.
 
 ## Language Codes
 
@@ -41,55 +45,17 @@ That's it. The language menu, device detection, and persistence work automatical
 | `tr` | Turkish | Türkçe |
 | `zh` | Chinese (Simplified) | 简体中文 |
 
-## File Format
+## File Structure
 
-Each language file must be valid JSON with these keys:
+Each language has its own directory with 3 files:
 
-```json
-{
-  "app_name": "",
-  "encrypt": "",
-  "decrypt": "",
-  "password": "",
-  "input_text": "",
-  "output_text": "",
-  "copy": "",
-  "clear": "",
-  "encrypt_button": "",
-  "decrypt_button": "",
-  "password_strength": "",
-  "count": "",
-  "weak": "",
-  "medium": "",
-  "strong": "",
-  "copied": "",
-  "error": "",
-  "success": "",
-  "select_language": "",
-  "offline_secure": "",
-  "offline_desc": "",
-  "input_label": "",
-  "output": "",
-  "password_required": "",
-  "password_too_weak": "",
-  "decrypt_error": "",
-  "about": "",
-  "developer": "",
-  "source_code": "",
-  "version": "",
-  "whats_new_title": "",
-  "whats_new_body": "",
-  "how_to_use_title": "",
-  "how_to_use": "",
-  "disclaimer_title": "",
-  "disclaimer_body": "",
-  "content_desc_back": "",
-  "content_desc_language": "",
-  "content_desc_about": "",
-  "generate_password": "",
-  "length": ""
-}
-```
+| File | Content | Keys |
+|------|---------|------|
+| `main.json` | UI, settings, boxes, security | 160 |
+| `help.json` | Help & Guide screen content | 33 |
+| `about.json` | About screen (version, how-to, disclaimer) | 10 |
+
+The `LocalizationManager` automatically scans the directory and merges all `.json` files — adding a new file requires no code changes.
 
 ## Notes
 

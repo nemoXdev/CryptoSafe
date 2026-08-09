@@ -1,0 +1,8 @@
+• Buzones cifrados (Chat) con contraseñas por buzón
+• Bloqueo de aplicaciones con PIN y desbloqueo biométrico
+• Base de datos cifrada (SQLCipher)
+• Compartir intención de otras aplicaciones
+• Eliminación automática de mensajes (de 1 hora a 90 días)
+• Pantalla de configuración
+• Pantalla de ayuda y guía con documentación detallada
+• Mejoras generales y corrección de errores.

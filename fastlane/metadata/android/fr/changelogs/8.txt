@@ -1,0 +1,8 @@
+• Boîtes cryptées (Chat) avec mots de passe par boîte
+• Verrouillage d'application avec code PIN et déverrouillage biométrique
+• Base de données cryptée (SQLCipher)
+• Partager l'intention d'autres applications
+• Messages à suppression automatique (1 h à 90 jours)
+• Écran Paramètres
+• Écran d'aide et de guide avec documentation détaillée
+• Améliorations générales et corrections de bugs

@@ -1,1 +1,1 @@
-Offline AES-256-GCM text encryption with Argon2id
+Offline AES-256-GCM text encryption with Argon2id, no internet permission
