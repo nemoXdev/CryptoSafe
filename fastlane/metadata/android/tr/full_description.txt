@@ -1,15 +1,17 @@
-CryptoSafe, Anonim Şifreli Kutularla askeri düzeyde metin şifrelemeye yönelik hafif, çevrimdışı öncelikli bir Android uygulamasıdır. Verileriniz cihazınızdan asla ayrılmaz.
+CryptoSafe, metinleri şifrelemek ve şifrelerini çözmek için tamamen çevrimdışı çalışan bir uygulamadır. İnterneti hiç kullanmaz ve her şey telefonunuzda kalır.
 
 Özellikler:
-• Güçlü Şifreleme: Argon2id anahtar türetme ile AES-256-GCM (128 MiB, 4 yineleme)
-• Şifreli Kutular: Kutu başına şifreler içeren, şifre korumalı kutulardaki konuşmaları düzenleyin
-• Uygulama Kilidi: Otomatik kilitleme zamanlayıcısı ile PIN ve Biyometrik (parmak izi) kilidini açma
-• Şifreli Veritabanı: SQLCipher şifreli veritabanında saklanan tüm veriler
-• %100 Çevrimdışı: İnternet izni gerekmez
-• Box'ta Paylaş: WhatsApp, Telegram ve diğer uygulamalardan paylaşılan metni alın
-• Mesajları Otomatik Sil: Mesajları 1 saatten 90 güne kadar otomatik olarak silinecek şekilde ayarlayın
-• Ekran Görüntüsü Koruması: FLAG_SECURE kazara yapılan sızıntıları önler
-• Şifre Oluşturucu: Yerleşik rastgele şifre oluşturucu
-• Modern kullanıcı arayüzü: Koyu temalı Materyal 3 tasarımı
+• Anonim Kutular: her biri kendi şifresine sahip, şifre korumalı kutularda sohbet edin
+• Güçlü şifreleme: Argon2id anahtar türetme ile AES-256-GCM
+• Uygulama Kilidi: PIN ve parmak iziyle kilit açma, otomatik kilit zamanlayıcılı
+• Şifreli veritabanı (SQLCipher): hiçbir şey düz metin olarak saklanmaz
+• Kutuya paylaş: WhatsApp, Telegram ve diğer uygulamalardan gelen şifreli metinleri doğrudan bir kutuya al
+• Kutudan paylaş: mesaj kutusundaki şifreli metinleri diğer uygulamalarla paylaş
+• Mesajları otomatik sil (1 saat ila 90 gün)
+• Kutu kilit modları: her seferinde sor, bir süre hatırla veya oturum için sakla
+• Güç göstergeli yerleşik şifre üreteci
+• Tüm ekranlarda ekran görüntüsü koruması
+• Ayrıntılı dokümantasyon içeren Yardım ve Kılavuz ekranı
+• 15 dile çevrilmiştir
 
-
+Gelişmemize yardım edin: https://github.com/nemoXdev/CryptoSafe/issues adresinde hataları bildirin veya özellik önerin, ya da https://github.com/nemoXdev/CryptoSafe/blob/develop/app/src/main/assets/locales/README.md adresinde çevirilere katkıda bulunun. Katkınızla uygulama gelişmeye devam ediyor.

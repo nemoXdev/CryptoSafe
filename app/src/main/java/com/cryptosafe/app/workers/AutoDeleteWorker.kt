@@ -15,9 +15,8 @@ class AutoDeleteWorker(
     override suspend fun doWork(): Result {
         return try {
             val appContext = applicationContext
-            val dbFile = appContext.getDatabasePath("cryptosafe.db")
-            val hasKey = SecurePasswordStorage.getDatabasePassphrase() != null
-            if (dbFile.exists() && dbFile.length() > 0 && !hasKey) {
+            SecurePasswordStorage.initialize(appContext)
+            if (!SecurePasswordStorage.canSafelyOpenExistingDb(appContext)) {
                 com.cryptosafe.app.DiagnosticsLogger.logEvent("WARN", "auto_delete_worker_skipped_key_missing")
                 return Result.failure()
             }

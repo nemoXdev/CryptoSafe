@@ -1,6 +1,7 @@
 package com.cryptosafe.app.screens
 
 import android.content.Intent
+import android.util.Base64
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -49,12 +51,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.data.AppDatabase
@@ -77,7 +78,6 @@ fun ChatScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val clipboard = LocalClipboardManager.current
     val messages by database.boxDao().getMessagesByBoxId(box.id).collectAsState(initial = emptyList())
     val listState = rememberLazyListState()
     var inputText by remember { mutableStateOf("") }
@@ -86,9 +86,59 @@ fun ChatScreen(
     var showDecryptWarning by remember { mutableStateOf(false) }
     val dateFormat = remember { SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()) }
 
-    // عند قفل التطبيق تُغلق نافذة تأكيد الحذف فوراً (نافذة منفصلة تبقى ظاهرة فوق شاشة القفل)
+    
+    
     LaunchedEffect(locked) {
-        if (locked) messageToDelete = null
+        if (locked) {
+            messageToDelete = null
+            decryptedMessages = emptyMap()
+        }
+    }
+
+    
+    
+    
+    
+    var boxKey by remember(box.id) { mutableStateOf<ByteArray?>(null) }
+    var boxSalt by remember(box.id) { mutableStateOf<ByteArray?>(null) }
+
+    LaunchedEffect(box.id, boxPassword, locked) {
+        if (locked) {
+            boxKey?.fill(0)
+            boxKey = null
+            boxSalt = null
+            return@LaunchedEffect
+        }
+        if (boxKey == null) {
+            val passChars = boxPassword.toCharArray()
+            try {
+                val salt = withContext(Dispatchers.IO) {
+                    var s = box.encryptionSalt?.let {
+                        runCatching { Base64.decode(it, Base64.NO_WRAP) }.getOrNull()
+                    }
+                    if (s == null || s.size != CryptoEngine.SALT_LENGTH) {
+                        s = CryptoEngine.generateSalt()
+                        database.boxDao().updateBox(
+                            box.copy(encryptionSalt = Base64.encodeToString(s, Base64.NO_WRAP))
+                        )
+                    }
+                    s
+                }
+                val key = withContext(Dispatchers.IO) { CryptoEngine.deriveBoxKey(passChars, salt) }
+                boxSalt = salt
+                boxKey = key
+            } catch (e: Exception) {
+                
+            } finally {
+                passChars.fill('\u0000')
+            }
+        }
+    }
+
+    DisposableEffect(box.id) {
+        onDispose {
+            boxKey?.fill(0)
+        }
     }
 
     LaunchedEffect(messages.size) {
@@ -219,7 +269,16 @@ fun ChatScreen(
                                             scope.launch {
                                                 try {
                                                     val decrypted = withContext(Dispatchers.IO) {
-                                                        CryptoEngine.decrypt(message.encryptedText, passChars)
+                                                        val key = boxKey
+                                                        val salt = boxSalt
+                                                        if (key != null && salt != null) {
+                                                            
+                                                            
+                                                            CryptoEngine.decryptWithKey(message.encryptedText, key, salt)
+                                                                ?: CryptoEngine.decrypt(message.encryptedText, passChars)
+                                                        } else {
+                                                            CryptoEngine.decrypt(message.encryptedText, passChars)
+                                                        }
                                                     }
                                                     decryptedMessages = decryptedMessages + (message.id to decrypted)
                                                 } catch (e: Exception) {
@@ -272,8 +331,10 @@ fun ChatScreen(
                                 }
                                 IconButton(
                                     onClick = {
-                                        clipboard.setText(AnnotatedString(displayText))
-                                        Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                                        
+                                        ClipboardHelper.copySensitive(context, displayText) {
+                                            Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                                        }
                                     },
                                     modifier = Modifier.size(28.dp)
                                 ) {
@@ -343,7 +404,13 @@ fun ChatScreen(
                     val passChars = boxPassword.toCharArray()
                     scope.launch(Dispatchers.IO) {
                         try {
-                            val encrypted = CryptoEngine.encrypt(textToSend, passChars)
+                            
+                            
+                            val encrypted = if (boxKey != null && boxSalt != null) {
+                                CryptoEngine.encryptWithKey(textToSend, boxKey!!, boxSalt!!)
+                            } else {
+                                CryptoEngine.encrypt(textToSend, passChars)
+                            }
                             database.boxDao().insertMessage(
                                 Message(
                                     boxId = box.id,

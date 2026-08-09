@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.0] - 2026-08-07
+
+### Fixed
+- Derived encryption key is now zeroed after use
+
+### Added
+- Storage mode indicator in diagnostics export
+- Fallback storage mode warning card (when the Keystore fails completely)
+- Help section explaining data security on rooted/compromised devices
+
+### Changed
+- Updated in-app help: lock-mode labels now match the actual behavior
+  (ask every time / remember for a while / do not ask again this session)
+- Internal security hardening (authenticated encryption scheme versioning)
+
 ## [2.0.0] - 2026-07-30
 
 ### Added

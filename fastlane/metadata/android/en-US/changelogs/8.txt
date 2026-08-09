@@ -1,4 +1,3 @@
-Version 2.0.0:
 • Encrypted Boxes (Chat) with per-box passwords
 • App Lock with PIN and Biometric unlock
 • Encrypted database (SQLCipher)

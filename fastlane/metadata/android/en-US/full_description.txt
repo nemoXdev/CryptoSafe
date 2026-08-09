@@ -1,15 +1,17 @@
-CryptoSafe is a lightweight, offline-first Android app for military-grade text encryption with Anonymous Encrypted Boxes. Your data never leaves your device.
+CryptoSafe is a fully offline app for encrypting and decrypting text. It doesn't use the internet at all, and everything stays on your phone.
 
 Features:
-• Strong Encryption: AES-256-GCM with Argon2id key derivation (128 MiB, 4 iterations)
-• Encrypted Boxes: Organize conversations in password-protected boxes with per-box passwords
-• App Lock: PIN and Biometric (fingerprint) unlock with auto-lock timer
-• Encrypted Database: All data stored in SQLCipher encrypted database
-• 100% Offline: No internet permission needed
-• Share to Box: Receive text shared from WhatsApp, Telegram, and other apps
-• Auto-delete Messages: Set messages to auto-delete after 1 hour to 90 days
-• Screenshot Protection: FLAG_SECURE prevents accidental leaks
-• Password Generator: Built-in random password generator
-• Modern UI: Material 3 design with dark theme
+• Anonymous Boxes: chat in password-protected boxes, each with its own password
+• Strong encryption: AES-256-GCM with Argon2id key derivation
+• App Lock: PIN and fingerprint unlock with an auto-lock timer
+• Encrypted database (SQLCipher): nothing is stored in plaintext
+• Share into a box: receive encrypted texts from WhatsApp, Telegram and other apps directly into a box
+• Share from a box: share encrypted texts from a message box with other apps
+• Auto-delete messages (from 1 hour to 90 days)
+• Box lock modes: ask every time, remember for a while, keep for the session, or remember permanently
+• Built-in password generator with strength indicator
+• Screenshot protection on every screen
+• Help & Guide screen with detailed documentation
+• Translated into 15 languages
 
-
+Help us improve: report issues or suggest features at https://github.com/nemoXdev/CryptoSafe/issues, or contribute a translation at https://github.com/nemoXdev/CryptoSafe/blob/develop/app/src/main/assets/locales/README.md. With your contribution, the app keeps getting better.

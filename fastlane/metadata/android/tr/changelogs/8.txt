@@ -1,4 +1,3 @@
-Sürüm 2.0.0:
 • Kutu başına şifreler içeren Şifreli Kutular (Sohbet)
 • PIN ve Biyometrik kilit açma özellikli Uygulama Kilidi
 • Şifrelenmiş veritabanı (SQLCipher)

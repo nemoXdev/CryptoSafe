@@ -1,1 +1,1 @@
-Enkripsi teks offline AES-256-GCM dengan Argon2id
+Enkripsi teks AES-256-GCM offline dengan Argon2id, tanpa izin internet

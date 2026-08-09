@@ -56,16 +56,12 @@ import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.PillButton
 import com.cryptosafe.app.components.SafePasswordField
+import com.cryptosafe.app.security.BiometricCrypto
 import com.cryptosafe.app.security.BiometricHelper
 import com.cryptosafe.app.security.SecurePasswordStorage
 import kotlinx.coroutines.delay
 
-/**
- * شاشة فتح التطبيق — تصميم نافذة كلمة المرور المطلوب:
- * صندوق أسود بحد رمادي رفيع وزوايا 12dp، عنوان أبيض، حقل إدخال أبيض
- * بحدّ زيتي (3dp)، خيار "إظهار كلمة المرور"، وزرّين دائرية الشكل
- * (زيتي للتأكيد، ذهبي للإلغاء). الإلغاء أو الخروج يُنهي التطبيق.
- */
+
 @Composable
 fun LockScreen(
     onUnlock: () -> Unit,
@@ -274,11 +270,17 @@ fun LockScreen(
                             Toast.makeText(context, LocalizationManager.getString("error"), Toast.LENGTH_SHORT).show()
                             return@OutlinedButton
                         }
+                        val cipher = if (BiometricHelper.isStrongAvailable(context)) {
+                            BiometricCrypto.createEncryptCipher()
+                        } else {
+                            null
+                        }
                         BiometricHelper.authenticate(
                             activity = activity,
                             title = LocalizationManager.getString("biometric_title"),
                             subtitle = LocalizationManager.getString("biometric_subtitle"),
                             negativeButtonText = LocalizationManager.getString("cancel"),
+                            cryptoObject = cipher?.let { androidx.biometric.BiometricPrompt.CryptoObject(it) },
                             onSuccess = {
                                 SecurePasswordStorage.setPinAttempts(0)
                                 SecurePasswordStorage.setPinLockoutTime(0)

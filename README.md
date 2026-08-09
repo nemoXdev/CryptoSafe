@@ -46,7 +46,7 @@ Your support means a lot! If you find CryptoSafe useful, please:
 
 
 
-[![GitHub release](https://img.shields.io/badge/release-v2.0.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
+[![GitHub release](https://img.shields.io/badge/release-v2.1.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-green)](https://android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)](https://kotlinlang.org)
@@ -172,6 +172,8 @@ The "AllowedAPKSigningKeys" field in the F-Droid metadata ensures that official 
 | Brute-force Protection | 5 failed PIN attempts → 30 second lockout. |
 
 *Warning: If you lose your password or PIN, encrypted data cannot be recovered. Keep backups of both encrypted text and passwords in a safe place.*
+
+*See the in-app Help & Guide → "Rooted Devices & Data Security" for the full threat model.*
 
 ---
 

@@ -40,6 +40,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,11 +50,9 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -61,6 +60,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import kotlin.math.roundToInt
@@ -74,7 +74,7 @@ fun PasswordStrengthCard(
     strength: Pair<Int, String>
 ) {
     val context = LocalContext.current
-    val clipboard = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
     val prefs = remember { context.getSharedPreferences("password_prefs", android.content.Context.MODE_PRIVATE) }
     var passwordLength by remember { mutableFloatStateOf(prefs.getInt("length", 16).toFloat()) }
     fun savePrefs() { prefs.edit().apply { putInt("length", passwordLength.toInt()); apply() } }
@@ -223,7 +223,14 @@ fun PasswordStrengthCard(
                 Button(onClick = { onPasswordChange(CryptoEngine.generatePassword(length = passwordLength.toInt()).toCharArray()) }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)) {
                     Icon(Icons.Default.Casino, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(modifier = Modifier.width(6.dp)); Text(LocalizationManager.getString("generate_password"), fontSize = 13.sp)
                 }
-                Button(onClick = { if (password.isNotEmpty()) { clipboard.setText(AnnotatedString(String(password))); Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show() } }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
+                Button(onClick = {
+                    if (password.isNotEmpty()) {
+                        val text = String(password)
+                        ClipboardHelper.copySensitive(context, text) {
+                            Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)) {
                     Icon(Icons.Default.ContentCopy, contentDescription = null, modifier = Modifier.size(18.dp)); Spacer(modifier = Modifier.width(6.dp)); Text(LocalizationManager.getString("copy"), fontSize = 13.sp)
                 }
             }

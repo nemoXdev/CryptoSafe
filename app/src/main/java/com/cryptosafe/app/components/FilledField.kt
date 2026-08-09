@@ -14,11 +14,6 @@ import com.cryptosafe.app.theme.FieldFill
 import com.cryptosafe.app.theme.FieldFillFocused
 import com.cryptosafe.app.theme.FieldText
 
-/**
- * حقل إدخال بشكل "الصندوق المملوء" المستوحى من التطبيق المرجعي: خلفية فاتحة
- * تبرز عن خلفية النافذة الغامقة، وحدّ نحاسي واضح عند التركيز، بدل الحقل
- * الشفاف ذي الحدّ الرفيع (OutlinedTextField) الافتراضي.
- */
 @Composable
 fun FilledField(
     value: String,

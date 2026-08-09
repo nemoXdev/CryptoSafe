@@ -1,0 +1,8 @@
+• Caixas criptografadas (bate-papo) com senhas por caixa
+• Bloqueio de aplicativo com PIN e desbloqueio biométrico
+• Banco de dados criptografado (SQLCipher)
+• Receba textos criptografados de outros aplicativos
+• Compartilhe textos criptografados de uma caixa de mensagens com outros aplicativos
+• Exclusão automática de mensagens (1h a 90 dias)
+• Tela de configurações
+• Tela de Ajuda e Guia com documentação detalhada

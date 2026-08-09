@@ -33,15 +33,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cryptosafe.app.ClipboardHelper
 import com.cryptosafe.app.CryptoEngine
 import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.InputCard
@@ -67,7 +66,6 @@ fun DecryptScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val clipboard = LocalClipboardManager.current
 
     val formContent: @Composable () -> Unit = {
         OutlinedTextField(
@@ -160,8 +158,10 @@ fun DecryptScreen(
             OutputCard(
                 outputText = outputText,
                 onCopy = {
-                    clipboard.setText(AnnotatedString(outputText))
-                    Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                    
+                    ClipboardHelper.copySensitive(context, outputText) {
+                        Toast.makeText(context, LocalizationManager.getString("copied"), Toast.LENGTH_SHORT).show()
+                    }
                 },
                 onShare = {
                     val shareIntent = Intent(Intent.ACTION_SEND).apply {

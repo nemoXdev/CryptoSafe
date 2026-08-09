@@ -1,15 +1,17 @@
-CryptoSafe es una aplicación de Android liviana y sin conexión para cifrado de texto de nivel militar con cajas cifradas anónimas. Sus datos nunca salen de su dispositivo.
+CryptoSafe es una aplicación totalmente sin conexión para cifrar y descifrar texto. No usa internet en absoluto y todo permanece en tu teléfono.
 
 Características:
-• Cifrado fuerte: AES-256-GCM con derivación de clave Argon2id (128 MiB, 4 iteraciones)
-• Buzones cifrados: organice conversaciones en buzones protegidos con contraseñas por buzón
-• Bloqueo de aplicaciones: desbloqueo mediante PIN y biométrico (huella digital) con temporizador de bloqueo automático
-• Base de datos cifrada: todos los datos almacenados en la base de datos cifrada SQLCipher
-• 100% sin conexión: no se necesita permiso de Internet
-• Compartir en Box: reciba texto compartido desde WhatsApp, Telegram y otras aplicaciones
-• Eliminación automática de mensajes: configure los mensajes para que se eliminen automáticamente después de 1 hora a 90 días.
-• Protección de capturas de pantalla: FLAG_SECURE evita fugas accidentales
-• Generador de contraseñas: generador de contraseñas aleatorias incorporado
-• UI moderna: diseño Material 3 con tema oscuro
+• Buzones anónimos: chatea en buzones protegidos por contraseña, cada uno con su propia contraseña
+• Cifrado fuerte: AES-256-GCM con derivación de clave Argon2id
+• Bloqueo de aplicación: PIN y huella dactilar con temporizador de bloqueo automático
+• Base de datos cifrada (SQLCipher): nada se guarda en texto plano
+• Compartir en un buzón: recibe textos cifrados desde WhatsApp, Telegram y otras aplicaciones directamente en un buzón
+• Compartir desde un buzón: comparte textos cifrados desde un buzón de mensajes con otras aplicaciones
+• Eliminación automática de mensajes (de 1 hora a 90 días)
+• Modos de bloqueo de buzones: preguntar cada vez, recordar un rato, mantener para la sesión o recordar permanentemente
+• Generador de contraseñas integrado con indicador de fortaleza
+• Protección de capturas de pantalla en todas las pantallas
+• Pantalla de ayuda y guía con documentación detallada
+• Traducido a 15 idiomas
 
-
+Ayúdanos a mejorar: informa de errores o sugiere funciones en https://github.com/nemoXdev/CryptoSafe/issues, o contribuye con traducciones en https://github.com/nemoXdev/CryptoSafe/blob/develop/app/src/main/assets/locales/README.md. Con tu aportación, la aplicación mejora cada vez más.

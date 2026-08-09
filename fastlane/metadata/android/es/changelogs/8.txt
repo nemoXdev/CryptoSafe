@@ -1,4 +1,3 @@
-Versión 2.0.0:
 • Buzones cifrados (Chat) con contraseñas por buzón
 • Bloqueo de aplicaciones con PIN y desbloqueo biométrico
 • Base de datos cifrada (SQLCipher)

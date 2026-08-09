@@ -1,1 +1,1 @@
-Argon2id ile çevrimdışı AES-256-GCM metin şifreleme
+AES-256-GCM ile çevrimdışı metin şifreleme, Argon2id, internet izni yok

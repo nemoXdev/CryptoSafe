@@ -20,48 +20,26 @@ interface KeyDeriver {
 
 object CryptoEngine {
 
-    private const val SALT_LENGTH = 16
+    const val SALT_LENGTH = 16
     private const val IV_LENGTH = 12
     private const val KEY_LENGTH = 256
 
-    /**
-     * حقن دالة اشتقاق المفتاح لأغراض الاختبار على JVM (Robolectric).
-     * الافتراضي هو Argon2id (Argon2Deriver). لا تعدّلها خارج الاختبارات.
-     */
+    
+    
+    private const val FORMAT_VERSION: Byte = 0x01
+    private const val AAD_CONTEXT = "cryptosafe.box.v1"
+    
+    private const val MIN_VERSIONED_SIZE = 1 + SALT_LENGTH + IV_LENGTH + 16
+
+    
     @Volatile
     internal var keyDeriver: KeyDeriver = Argon2Deriver
 
-    fun encrypt(plainText: String, password: CharArray): String {
-        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
-        val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
-        val key = deriveKey(password, salt)
+    
+    fun generateSalt(): ByteArray = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
 
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
-        val ciphertext = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
-
-        val combined = salt + iv + ciphertext
-        return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
-    }
-
-    fun decrypt(encoded: String, password: CharArray): String {
-        val combined = android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP)
-        if (combined.size < SALT_LENGTH + IV_LENGTH + 16) {
-            throw IllegalArgumentException("Invalid encrypted data format")
-        }
-
-        val salt = combined.sliceArray(0 until SALT_LENGTH)
-        val iv = combined.sliceArray(SALT_LENGTH until SALT_LENGTH + IV_LENGTH)
-        val ciphertext = combined.sliceArray(SALT_LENGTH + IV_LENGTH until combined.size)
-
-        val key = deriveKey(password, salt)
-        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
-        cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
-
-        return cipher.doFinal(ciphertext).toString(Charsets.UTF_8)
-    }
-
-    private fun deriveKey(password: CharArray, salt: ByteArray): ByteArray {
+    
+    fun deriveBoxKey(password: CharArray, salt: ByteArray): ByteArray {
         val charBuffer = CharBuffer.wrap(password)
         val byteBuffer = Charsets.UTF_8.newEncoder().encode(charBuffer)
         val passwordBytes = ByteArray(byteBuffer.remaining())
@@ -74,6 +52,111 @@ object CryptoEngine {
             passwordBytes.fill(0)
         }
     }
+
+    
+    fun encryptWithKey(plainText: String, key: ByteArray, salt: ByteArray): String {
+        val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
+        cipher.updateAAD(AAD_CONTEXT.toByteArray(Charsets.UTF_8))
+        val ciphertext = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+
+        val combined = byteArrayOf(FORMAT_VERSION) + salt + iv + ciphertext
+        return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
+    }
+
+    
+    fun decryptWithKey(encoded: String, key: ByteArray, expectedSalt: ByteArray): String? {
+        return try {
+            val combined = android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP)
+            if (combined.size < MIN_VERSIONED_SIZE) return null
+
+            val headerSalt = if (combined[0] == FORMAT_VERSION) {
+                combined.sliceArray(1 until 1 + SALT_LENGTH)
+            } else {
+                combined.sliceArray(0 until SALT_LENGTH)
+            }
+            if (!headerSalt.contentEquals(expectedSalt)) return null
+
+            val offset = if (combined[0] == FORMAT_VERSION) 1 else 0
+            val iv = combined.sliceArray(offset + SALT_LENGTH until offset + SALT_LENGTH + IV_LENGTH)
+            val ciphertext = combined.sliceArray(offset + SALT_LENGTH + IV_LENGTH until combined.size)
+
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
+            if (combined[0] == FORMAT_VERSION) {
+                cipher.updateAAD(AAD_CONTEXT.toByteArray(Charsets.UTF_8))
+            }
+            cipher.doFinal(ciphertext).toString(Charsets.UTF_8)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun encrypt(plainText: String, password: CharArray): String {
+        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
+        val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
+        val key = deriveKey(password, salt)
+
+        try {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.ENCRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
+            cipher.updateAAD(AAD_CONTEXT.toByteArray(Charsets.UTF_8))
+            val ciphertext = cipher.doFinal(plainText.toByteArray(Charsets.UTF_8))
+
+            val combined = byteArrayOf(FORMAT_VERSION) + salt + iv + ciphertext
+            return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
+        } finally {
+            key.fill(0)
+        }
+    }
+
+    fun decrypt(encoded: String, password: CharArray): String {
+        val combined = android.util.Base64.decode(encoded, android.util.Base64.NO_WRAP)
+
+        
+        
+        
+        if (combined.size >= MIN_VERSIONED_SIZE && combined[0] == FORMAT_VERSION) {
+            return try {
+                decryptLayout(combined, offset = 1, password, withAad = true)
+            } catch (_: Exception) {
+                decryptLayout(combined, offset = 0, password, withAad = false)
+            }
+        }
+
+        return decryptLayout(combined, offset = 0, password, withAad = false)
+    }
+
+    private fun decryptLayout(
+        combined: ByteArray,
+        offset: Int,
+        password: CharArray,
+        withAad: Boolean
+    ): String {
+        val required = offset + SALT_LENGTH + IV_LENGTH + 16
+        if (combined.size < required) {
+            throw IllegalArgumentException("Invalid encrypted data format")
+        }
+
+        val salt = combined.sliceArray(offset until offset + SALT_LENGTH)
+        val iv = combined.sliceArray(offset + SALT_LENGTH until offset + SALT_LENGTH + IV_LENGTH)
+        val ciphertext = combined.sliceArray(offset + SALT_LENGTH + IV_LENGTH until combined.size)
+
+        val key = deriveKey(password, salt)
+        try {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+            cipher.init(Cipher.DECRYPT_MODE, SecretKeySpec(key, "AES"), GCMParameterSpec(128, iv))
+            if (withAad) cipher.updateAAD(AAD_CONTEXT.toByteArray(Charsets.UTF_8))
+
+            return cipher.doFinal(ciphertext).toString(Charsets.UTF_8)
+        } finally {
+            key.fill(0)
+        }
+    }
+
+    private fun deriveKey(password: CharArray, salt: ByteArray): ByteArray =
+        deriveBoxKey(password, salt)
 
     fun generatePassword(length: Int = 16): String {
         val upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -121,16 +204,14 @@ object CryptoEngine {
         val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
         val pinBytes = pin.toByteArray(Charsets.UTF_8)
         val result = keyDeriver.derive(pinBytes, salt, 65536, 32)
-        val combined = salt + result
+        
+        val combined = byteArrayOf(FORMAT_VERSION) + salt + result
         return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
     }
 
     fun verifyPin(pin: String, storedHash: String): Boolean {
         return try {
-            val decoded = android.util.Base64.decode(storedHash, android.util.Base64.NO_WRAP)
-            val salt = decoded.sliceArray(0 until SALT_LENGTH)
-            val expectedHash = decoded.sliceArray(SALT_LENGTH until decoded.size)
-
+            val (salt, expectedHash) = splitStoredHash(storedHash)
             val pinBytes = pin.toByteArray(Charsets.UTF_8)
             keyDeriver.derive(pinBytes, salt, 65536, 32).contentEquals(expectedHash)
         } catch (e: Exception) {
@@ -142,24 +223,32 @@ object CryptoEngine {
         val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
         val passwordBytes = password.toByteArray(Charsets.UTF_8)
         val result = keyDeriver.derive(passwordBytes, salt, 65536, 32)
-        val combined = salt + result
+        val combined = byteArrayOf(FORMAT_VERSION) + salt + result
         return android.util.Base64.encodeToString(combined, android.util.Base64.NO_WRAP)
     }
 
-    /**
-     * يتحقق من كلمة مرور صندوق مقابل الهاش المخزّن (نفس صيغة hashPasswordForStorage).
-     * لا يخزن ولا يعيد كلمة المرور نفسها أبداً — فقط true/false.
-     */
+    
     fun verifyPasswordForStorage(password: String, storedHash: String): Boolean {
         return try {
-            val decoded = android.util.Base64.decode(storedHash, android.util.Base64.NO_WRAP)
-            val salt = decoded.sliceArray(0 until SALT_LENGTH)
-            val expectedHash = decoded.sliceArray(SALT_LENGTH until decoded.size)
-
+            val (salt, expectedHash) = splitStoredHash(storedHash)
             val passwordBytes = password.toByteArray(Charsets.UTF_8)
             keyDeriver.derive(passwordBytes, salt, 65536, 32).contentEquals(expectedHash)
         } catch (e: Exception) {
             false
+        }
+    }
+
+    
+    private fun splitStoredHash(decodedBase64: String): Pair<ByteArray, ByteArray> {
+        val decoded = android.util.Base64.decode(decodedBase64, android.util.Base64.NO_WRAP)
+        return if (decoded.size >= 1 + SALT_LENGTH + 32 && decoded[0] == FORMAT_VERSION) {
+            decoded.copyOfRange(1, 1 + SALT_LENGTH) to
+                decoded.copyOfRange(1 + SALT_LENGTH, 1 + SALT_LENGTH + 32)
+        } else if (decoded.size == SALT_LENGTH + 32) {
+            decoded.copyOfRange(0, SALT_LENGTH) to
+                decoded.copyOfRange(SALT_LENGTH, SALT_LENGTH + 32)
+        } else {
+            throw IllegalArgumentException("Invalid stored hash format")
         }
     }
 }

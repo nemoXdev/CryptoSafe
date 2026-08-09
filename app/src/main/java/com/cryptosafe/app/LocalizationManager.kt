@@ -5,6 +5,10 @@ import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
 
@@ -12,6 +16,7 @@ object LocalizationManager {
     private var prefs: SharedPreferences? = null
     private var appContext: Context? = null
     private val translations = mutableMapOf<String, JSONObject>()
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val allLocales = listOf(
         "en", "ar", "fr", "es", "de", "zh", "pt", "fa", "ku", "hi", "tr", "ru", "id", "ko", "ja"
     )
@@ -32,15 +37,15 @@ object LocalizationManager {
             else -> "en"
         }
 
-        // اللغة النشطة فقط تُحمَّل أمامياً (سريع)؛ بقية اللغات تُحمَّل بالخلفية
-        // حتى لا يؤخر تحليل الـ JSON كلها أول إطار للتطبيق.
+        
+        
         loadLocale(context, active)
         currentLocale = active
 
         val remaining = allLocales - active
-        Thread {
+        backgroundScope.launch(Dispatchers.IO) {
             remaining.forEach { loadLocale(context, it) }
-        }.start()
+        }
     }
 
     @Synchronized

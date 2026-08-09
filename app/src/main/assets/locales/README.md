@@ -4,8 +4,8 @@
 
 ### Step 1: Create translation files
 Create a directory `{code}/` (e.g. `de/` for German) with these files:
-- `main.json` — UI strings (137 keys)
-- `help.json` — Help screen content (21 keys)
+- `main.json` — UI strings (160 keys)
+- `help.json` — Help screen content (33 keys)
 - `about.json` — About screen content (10 keys)
 
 Copy the structure from the `en/` directory and translate all values.
@@ -51,8 +51,8 @@ Each language has its own directory with 3 files:
 
 | File | Content | Keys |
 |------|---------|------|
-| `main.json` | UI, settings, boxes, security | 137 |
-| `help.json` | Help & Guide screen content | 21 |
+| `main.json` | UI, settings, boxes, security | 160 |
+| `help.json` | Help & Guide screen content | 33 |
 | `about.json` | About screen (version, how-to, disclaimer) | 10 |
 
 The `LocalizationManager` automatically scans the directory and merges all `.json` files — adding a new file requires no code changes.

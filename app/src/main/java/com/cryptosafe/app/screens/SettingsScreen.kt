@@ -31,6 +31,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -56,8 +57,6 @@ import com.cryptosafe.app.LocalizationManager
 import com.cryptosafe.app.components.FilledField
 import com.cryptosafe.app.security.BiometricHelper
 import com.cryptosafe.app.security.SecurePasswordStorage
-
-// ---- عناصر مساعدة لشكل "قائمة مباشرة" بدون بطاقات (بس بألوان خزنة ونحاس) ----
 
 @Composable
 private fun SectionHeader(title: String) {
@@ -139,7 +138,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
     val canUseBiometric = BiometricHelper.isAvailable(context)
     val act = context as? Activity
 
-    // عند قفل التطبيق تُغلق نافذة السجل فوراً (نافذة منفصلة تبقى ظاهرة فوق شاشة القفل)
+    
     LaunchedEffect(locked) {
         if (locked) showDiagnosticsDialog = false
     }
@@ -169,7 +168,30 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
     ) {
         Spacer(modifier = Modifier.height(12.dp))
 
-        // ---- الأمان: رمز القفل (PIN) ----
+        if (SecurePasswordStorage.isStorageDegraded()) {
+            Surface(
+                color = MaterialTheme.colorScheme.errorContainer,
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        LocalizationManager.getString("fallback_warning_title"),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        LocalizationManager.getString("fallback_warning_desc"),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        }
+
+        
         SectionHeader(LocalizationManager.getString("security_settings"))
 
         if (!hasPin) {
@@ -320,7 +342,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
             color = MaterialTheme.colorScheme.outlineVariant
         )
 
-        // ---- مؤقت القفل التلقائي ----
+        
         if (hasPin) {
             SectionHeader(LocalizationManager.getString("auto_lock_timer"))
             val timerOptions = listOf(
@@ -354,7 +376,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
             }
         }
 
-        // ---- البصمة ----
+        
         if (canUseBiometric) {
             SectionHeader(LocalizationManager.getString("biometric_settings"))
             SettingsToggleRow(
@@ -368,7 +390,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
             )
         }
 
-        // ---- الخصوصية ----
+        
         SectionHeader(LocalizationManager.getString("privacy_settings"))
         SettingsToggleRow(
             title = LocalizationManager.getString("screenshot_protection"),
@@ -387,7 +409,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
             }
         )
 
-        // ---- التشخيص ----
+        
         SectionHeader(LocalizationManager.getString("diagnostics"))
         Row(
             modifier = Modifier
@@ -408,7 +430,7 @@ fun SettingsScreen(onBack: () -> Unit, onHelp: () -> Unit = {}, locked: Boolean 
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-        // ---- المساعدة ----
+        
         Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = onHelp,

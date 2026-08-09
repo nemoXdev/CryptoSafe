@@ -9,14 +9,15 @@ import java.security.SecureRandom
 
 object SecurePasswordStorage {
     private var prefs: SharedPreferences? = null
-    private var backupPrefs: SharedPreferences? = null
-    var isPassphraseLost = false
-        private set
-    var isBackupAvailable = false
-        private set
+    private var appContext: Context? = null
+
+    
+    fun isStorageDegraded(): Boolean = storageDegraded
+
+    private var storageDegraded = false
 
     fun initialize(context: Context) {
-        backupPrefs = context.getSharedPreferences("cryptosafe_db_backup", Context.MODE_PRIVATE)
+        appContext = context.applicationContext
         val rawPrefs = context.getSharedPreferences("cryptosafe_secure_prefs", Context.MODE_PRIVATE)
 
         try {
@@ -28,75 +29,38 @@ object SecurePasswordStorage {
                 EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
                 EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
             )
+            storageDegraded = false
             return
         } catch (e: Exception) {
-            // EncryptedSharedPreferences فشلت (جهاز به مشكلة نظام).
-            // نعود لملف عادي ولا نمسح أي شيء — القراءة من raw قد تعيد
-            // المفتاح الصحيح إذا كان قد حُفظ صريحاً من قبل.
-            prefs = rawPrefs
-
-            // علامة "fallback_plain" تعني أن المفتاح الموجود في raw كتبه كودنا
-            // كنص صريح، فهو موثوق. بدونها قد يكون الملف مكتوباً بواسطة ESP
-            // (قيمة مشفرة) فلا نثق به ونلجأ للنسخة الاحتياطية.
-            if (rawPrefs.getBoolean("fallback_plain", false)) {
-                val recovered = rawPrefs.getString("db_passphrase", null)
-                if (!recovered.isNullOrEmpty()) return
-            }
-
-            val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null)
-            if (!encryptedPass.isNullOrEmpty()) {
-                isBackupAvailable = true
-                isPassphraseLost = true
-                return
-            }
-
-            val recovered = rawPrefs.getString("db_passphrase", null)
-            if (!recovered.isNullOrEmpty()) return
-
-            isPassphraseLost = true
+            com.cryptosafe.app.DiagnosticsLogger.logEvent(
+                "WARN",
+                "esp_init_failed_using_keystore_encrypted_fallback"
+            )
         }
+
+        
+        val fallback = KeystoreEncryptedPrefs.create(
+            context,
+            "cryptosafe_secure_prefs_fallback"
+        )
+        if (fallback != null) {
+            prefs = fallback
+            storageDegraded = true
+            return
+        }
+
+        
+        
+        com.cryptosafe.app.DiagnosticsLogger.logEvent(
+            "CRITICAL",
+            "secure_storage_unavailable_writes_disabled"
+        )
+        prefs = NoopPrefs
+        storageDegraded = true
     }
 
-    // النسخة الاحتياطية تُنشأ من المفتاح الواضح + PIN النصي مباشرة،
-    // دون قراءة أي شيء من ESP — فهكذا تنجح حتى لو ESP معطوبة بالكامل.
     fun savePin(pin: String) {
         getPrefs().edit().putString("pin_hash", CryptoEngine.hashPin(pin)).apply()
-        syncBackupWithPin(pin)
-    }
-
-    private fun syncBackupWithPin(pin: String) {
-        val passphrase = prefs?.getString("db_passphrase", null) ?: return
-        try {
-            val encrypted = CryptoEngine.encrypt(passphrase, pin.toCharArray())
-            backupPrefs?.edit()?.putString("db_passphrase_enc", encrypted)?.apply()
-        } catch (_: Exception) {}
-    }
-
-    // استرجاع المفتاح من النسخة الاحتياطية عبر PIN. ينجح حتى لو ESP معطوبة.
-    fun recoverFromBackup(pin: String): Boolean {
-        val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null) ?: return false
-        return try {
-            val decrypted = CryptoEngine.decrypt(encryptedPass, pin.toCharArray())
-            getPrefs().edit().putString("db_passphrase", decrypted).apply()
-            markPlainFallback()
-            isPassphraseLost = false
-            isBackupAvailable = false
-            true
-        } catch (_: Exception) {
-            false
-        }
-    }
-
-    // تحقق فقط من صحة PIN مقابل الاحتياطي، دون حفظ أي شيء
-    // (تُستخدم لتأكيد الحذف النهائي قبل تنفيذه).
-    fun isBackupPinValid(pin: String): Boolean {
-        val encryptedPass = backupPrefs?.getString("db_passphrase_enc", null) ?: return false
-        return try {
-            CryptoEngine.decrypt(encryptedPass, pin.toCharArray())
-            true
-        } catch (_: Exception) {
-            false
-        }
     }
 
     fun hasPin(): Boolean {
@@ -105,7 +69,6 @@ object SecurePasswordStorage {
 
     fun removePinHash() {
         getPrefs().edit().remove("pin_hash").apply()
-        backupPrefs?.edit()?.remove("db_passphrase_enc")?.apply()
     }
 
     fun getPinHash(): String? {
@@ -144,40 +107,52 @@ object SecurePasswordStorage {
         getPrefs().edit().putBoolean("biometric_enabled", enabled).apply()
     }
 
+    
     fun getDatabasePassphrase(): ByteArray? {
+        val context = appContext ?: return null
+        KeystoreBox.decrypt(context)?.let { return it.toByteArray() }
         return getPrefs().getString("db_passphrase", null)?.toByteArray()
     }
 
+    
+    
     fun saveDatabasePassphrase(passphrase: String) {
+        val context = appContext ?: return
+        if (KeystoreBox.encrypt(context, passphrase)) {
+            KeystorePrefs.setMode(context, KeystorePrefs.MODE_KEYSTORE)
+            KeystorePrefs.setPassphraseStored(context, true)
+            return
+        }
+        KeystorePrefs.setMode(context, KeystorePrefs.MODE_ESP)
         getPrefs().edit().putString("db_passphrase", passphrase).apply()
-        markPlainFallback()
-    }
-
-    // تُكتب العلامة فقط عندما نكتب المفتاح بأنفسنا في وضع الـ fallback،
-    // لتأكيد أن قيمة db_passphrase في raw هي نص صريح موثوق.
-    private fun markPlainFallback() {
-        if (prefs == null) return
-        getPrefs().edit().putBoolean("fallback_plain", true).apply()
     }
 
     fun clearDatabasePassphrase() {
+        appContext?.let { KeystoreBox.delete(it) }
         getPrefs().edit().remove("db_passphrase").apply()
-        backupPrefs?.edit()?.remove("db_passphrase_enc")?.apply()
+    }
+
+    fun getStorageMode(): String {
+        val context = appContext ?: return KeystorePrefs.MODE_ESP
+        return KeystorePrefs.getMode(context)
     }
 
     fun getOrCreateDatabasePassphrase(): ByteArray {
         val existing = getDatabasePassphrase()
         if (existing != null && existing.isNotEmpty()) return existing
-        // يوجد احتياطي بانتظار الاسترجاع — لا ننشئ مفتاحاً جديداً أبداً
-        // وإلا تعذّر فتح القاعدة القديمة وتضيع البيانات للأبد.
-        if (isBackupAvailable) {
-            throw IllegalStateException("db_passphrase_lost_recovery_required")
-        }
+        
+        
         val bytes = ByteArray(32)
         SecureRandom().nextBytes(bytes)
         val passphrase = android.util.Base64.encodeToString(bytes, android.util.Base64.NO_WRAP)
         saveDatabasePassphrase(passphrase)
         return passphrase.toByteArray()
+    }
+
+    
+    fun canSafelyOpenExistingDb(context: Context): Boolean {
+        val dbFile = context.getDatabasePath("cryptosafe.db")
+        return !(dbFile.exists() && dbFile.length() > 0 && getDatabasePassphrase() == null)
     }
 
     fun saveBoxPassword(boxId: Long, password: String) {
@@ -204,6 +179,23 @@ object SecurePasswordStorage {
         getPrefs().edit().putInt("auto_lock_timer", seconds).apply()
     }
 
+    
+    fun getBoxAttempts(boxId: Long): Int {
+        return getPrefs().getInt("box_attempts_$boxId", 0)
+    }
+
+    fun setBoxAttempts(boxId: Long, attempts: Int) {
+        getPrefs().edit().putInt("box_attempts_$boxId", attempts).apply()
+    }
+
+    fun getBoxLockoutTime(boxId: Long): Long {
+        return getPrefs().getLong("box_lockout_$boxId", 0L)
+    }
+
+    fun setBoxLockoutTime(boxId: Long, time: Long) {
+        getPrefs().edit().putLong("box_lockout_$boxId", time).apply()
+    }
+
     fun getLastStopTime(): Long {
         return getPrefs().getLong("last_stop_time", 0L)
     }
@@ -223,4 +215,37 @@ object SecurePasswordStorage {
     private fun getPrefs(): SharedPreferences {
         return prefs ?: throw IllegalStateException("SecurePasswordStorage not initialized")
     }
+}
+
+
+private object NoopPrefs : SharedPreferences {
+    override fun getAll(): MutableMap<String, Any?> = HashMap()
+    override fun getString(key: String, defValue: String?): String? = defValue
+    override fun getStringSet(key: String, defValue: Set<String>?): Set<String>? = defValue
+    override fun getInt(key: String, defValue: Int): Int = defValue
+    override fun getLong(key: String, defValue: Long): Long = defValue
+    override fun getFloat(key: String, defValue: Float): Float = defValue
+    override fun getBoolean(key: String, defValue: Boolean): Boolean = defValue
+    override fun contains(key: String): Boolean = false
+
+    override fun edit(): SharedPreferences.Editor = object : SharedPreferences.Editor {
+        override fun putString(key: String, value: String?): SharedPreferences.Editor = this
+        override fun putStringSet(key: String, values: Set<String>?): SharedPreferences.Editor = this
+        override fun putInt(key: String, value: Int): SharedPreferences.Editor = this
+        override fun putLong(key: String, value: Long): SharedPreferences.Editor = this
+        override fun putFloat(key: String, value: Float): SharedPreferences.Editor = this
+        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor = this
+        override fun remove(key: String): SharedPreferences.Editor = this
+        override fun clear(): SharedPreferences.Editor = this
+        override fun commit(): Boolean = true
+        override fun apply() {}
+    }
+
+    override fun registerOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {}
+
+    override fun unregisterOnSharedPreferenceChangeListener(
+        listener: SharedPreferences.OnSharedPreferenceChangeListener
+    ) {}
 }

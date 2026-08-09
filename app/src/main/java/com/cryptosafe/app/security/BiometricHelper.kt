@@ -18,11 +18,17 @@ object BiometricHelper {
         }
     }
 
+    fun isStrongAvailable(context: Context): Boolean {
+        val manager = BiometricManager.from(context)
+        return manager.canAuthenticate(BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
+    }
+
     fun authenticate(
         activity: FragmentActivity,
         title: String,
         subtitle: String,
         negativeButtonText: String,
+        cryptoObject: BiometricPrompt.CryptoObject? = null,
         onSuccess: () -> Unit,
         onError: ((String) -> Unit)? = null
     ) {
@@ -33,6 +39,17 @@ object BiometricHelper {
             executor,
             object : BiometricPrompt.AuthenticationCallback() {
                 override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                    
+                    
+                    if (cryptoObject != null) {
+                        val cipher = cryptoObject.cipher
+                        if (cipher != null && BiometricCrypto.isAuthenticated(cipher)) {
+                            onSuccess()
+                        } else {
+                            onError?.invoke("Authentication failed")
+                        }
+                        return
+                    }
                     onSuccess()
                 }
 
@@ -50,11 +67,17 @@ object BiometricHelper {
             .setTitle(title)
             .setSubtitle(subtitle)
             .setNegativeButtonText(negativeButtonText)
-            .setAllowedAuthenticators(BIOMETRIC_STRONG or BIOMETRIC_WEAK)
+            .setAllowedAuthenticators(
+                if (cryptoObject != null) BIOMETRIC_STRONG else (BIOMETRIC_STRONG or BIOMETRIC_WEAK)
+            )
             .build()
 
         try {
-            biometricPrompt.authenticate(promptInfo)
+            if (cryptoObject != null) {
+                biometricPrompt.authenticate(promptInfo, cryptoObject)
+            } else {
+                biometricPrompt.authenticate(promptInfo)
+            }
         } catch (e: Exception) {
             onError?.invoke(e.message ?: "Biometric error")
         }

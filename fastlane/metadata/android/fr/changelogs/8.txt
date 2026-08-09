@@ -1,4 +1,3 @@
-Version 2.0.0 :
 • Boîtes cryptées (Chat) avec mots de passe par boîte
 • Verrouillage d'application avec code PIN et déverrouillage biométrique
 • Base de données cryptée (SQLCipher)

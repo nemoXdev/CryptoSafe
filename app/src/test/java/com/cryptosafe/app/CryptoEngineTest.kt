@@ -5,10 +5,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-/**
- * اختبارات JVM نقية (لا تحتاج Robolectric) للمنطق الخالي من Android:
- * مولّد كلمات المرور وقياس قوة كلمة المرور.
- */
+
 class CryptoEngineTest {
 
     @Test

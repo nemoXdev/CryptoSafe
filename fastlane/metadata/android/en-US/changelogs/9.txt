@@ -1,0 +1,8 @@
+• Encrypted Boxes (Chat) with per-box passwords
+• App Lock with PIN and Biometric unlock
+• Encrypted database (SQLCipher)
+• Receive encrypted texts from other apps
+• Share encrypted texts from a message box with other apps
+• Auto-delete messages (1h to 90 days)
+• Settings screen
+• Help & Guide screen with detailed documentation

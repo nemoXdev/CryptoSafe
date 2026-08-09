@@ -249,8 +249,9 @@ fun BoxSettingsScreen(
                     if (mode != "permanent" && box.lockMode == "permanent") {
                         SecurePasswordStorage.removeBoxPassword(box.id)
                     }
-                    // عند التبديل إلى "دائم": إن كانت كلمة المرور في ذاكرة الجلسة (سبق فتح الصندوق
-                    // هذه الجلسة) تُحفظ فوراً في التخزين المشفّر بدل انتظار أول فتح ناجح.
+                    
+                    
+                    
                     if (mode == "permanent") {
                         val cachedPw = boxSessionCache[box.id]?.first
                         if (cachedPw != null) {
@@ -417,8 +418,10 @@ fun ChangeBoxPasswordDialog(
             when {
                 !CryptoEngine.verifyPasswordForStorage(currentPassword, box.passwordHash) ->
                     Toast.makeText(context, LocalizationManager.getString("wrong_password"), Toast.LENGTH_SHORT).show()
-                newPassword.length < 4 ->
+                newPassword.length < 8 ->
                     Toast.makeText(context, LocalizationManager.getString("password_too_short"), Toast.LENGTH_SHORT).show()
+                CryptoEngine.checkPasswordStrength(newPassword.toCharArray()).second == "weak" ->
+                    Toast.makeText(context, LocalizationManager.getString("password_too_weak"), Toast.LENGTH_SHORT).show()
                 newPassword != confirmPassword ->
                     Toast.makeText(context, LocalizationManager.getString("passwords_do_not_match"), Toast.LENGTH_SHORT).show()
                 else -> {
@@ -430,30 +433,44 @@ fun ChangeBoxPasswordDialog(
                             val oldChars = currentPassword.toCharArray()
                             val newChars = newPassword.toCharArray()
                             try {
+                                
+                                
+                                val newSalt = CryptoEngine.generateSalt()
+                                val newKey = CryptoEngine.deriveBoxKey(newChars, newSalt)
                                 var successCount = 0
                                 var failCount = 0
-                                database.withTransaction {
-                                    val messages = database.boxDao().getMessagesByBoxIdSync(box.id)
-                                    val total = messages.count { !it.isPreEncrypted }
-                                    reencryptTotal = total
-                                    var done = 0
-                                    for (msg in messages) {
-                                        if (!msg.isPreEncrypted) {
-                                            done++
-                                            reencryptProgress = done
-                                            try {
-                                                val plain = CryptoEngine.decrypt(msg.encryptedText, oldChars)
-                                                val reEncrypted = CryptoEngine.encrypt(plain, newChars)
-                                                database.boxDao().updateMessage(msg.copy(encryptedText = reEncrypted))
-                                                successCount++
-                                            } catch (e: Exception) {
-                                                failCount++
+                                try {
+                                    database.withTransaction {
+                                        val messages = database.boxDao().getMessagesByBoxIdSync(box.id)
+                                        val total = messages.count { !it.isPreEncrypted }
+                                        reencryptTotal = total
+                                        var done = 0
+                                        for (msg in messages) {
+                                            if (!msg.isPreEncrypted) {
+                                                done++
+                                                reencryptProgress = done
+                                                try {
+                                                    val plain = CryptoEngine.decrypt(msg.encryptedText, oldChars)
+                                                    val reEncrypted = CryptoEngine.encryptWithKey(plain, newKey, newSalt)
+                                                    database.boxDao().updateMessage(msg.copy(encryptedText = reEncrypted))
+                                                    successCount++
+                                                } catch (e: Exception) {
+                                                    failCount++
+                                                }
                                             }
                                         }
+                                        database.boxDao().updateBox(
+                                            box.copy(
+                                                passwordHash = CryptoEngine.hashPasswordForStorage(newPassword),
+                                                encryptionSalt = android.util.Base64.encodeToString(
+                                                    newSalt,
+                                                    android.util.Base64.NO_WRAP
+                                                )
+                                            )
+                                        )
                                     }
-                                    database.boxDao().updateBox(
-                                        box.copy(passwordHash = CryptoEngine.hashPasswordForStorage(newPassword))
-                                    )
+                                } finally {
+                                    newKey.fill(0)
                                 }
                                 scope.launch(Dispatchers.Main) {
                                     isWorking = false

@@ -1,4 +1,3 @@
-Versi 2.0.0:
 • Kotak Terenkripsi (Obrolan) dengan kata sandi per kotak
 • Kunci Aplikasi dengan PIN dan buka kunci Biometrik
 • Basis data terenkripsi (SQLCipher)

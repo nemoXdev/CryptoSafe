@@ -290,8 +290,12 @@ fun CreateBoxScreen(
                     Toast.makeText(context, LocalizationManager.getString("enter_box_name"), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
-                if (password.length < 4) {
+                if (password.length < 8) {
                     Toast.makeText(context, LocalizationManager.getString("password_too_short"), Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+                if (CryptoEngine.checkPasswordStrength(password.toCharArray()).second == "weak") {
+                    Toast.makeText(context, LocalizationManager.getString("password_too_weak"), Toast.LENGTH_SHORT).show()
                     return@Button
                 }
                 if (password != confirmPassword) {
@@ -305,6 +309,12 @@ fun CreateBoxScreen(
                             Box(
                                 name = boxName,
                                 passwordHash = CryptoEngine.hashPasswordForStorage(password),
+                                
+                                
+                                encryptionSalt = android.util.Base64.encodeToString(
+                                    CryptoEngine.generateSalt(),
+                                    android.util.Base64.NO_WRAP
+                                ),
                                 autoDeleteHours = if (autoDeleteHours > 0) autoDeleteHours else null,
                                 lockMode = lockMode,
                                 lockTimeoutMinutes = if (lockMode == "timed") lockTimeoutMinutes else null

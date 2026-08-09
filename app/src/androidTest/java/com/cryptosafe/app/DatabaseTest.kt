@@ -16,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 /**
- * اختبارات قاعدة البيانات المشفرة (SQLCipher) — تعمل على محاكي/جهاز حقيقي فقط:
+ * Encrypted database (SQLCipher) tests - run on an emulator/real device only:
  * ./gradlew connectedAndroidTest
  */
 @RunWith(AndroidJUnit4::class)

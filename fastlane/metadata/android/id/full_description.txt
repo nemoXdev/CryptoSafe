@@ -1,15 +1,17 @@
-CryptoSafe adalah aplikasi Android ringan dan offline untuk enkripsi teks tingkat militer dengan Kotak Terenkripsi Anonim. Data Anda tidak akan pernah meninggalkan perangkat Anda.
+CryptoSafe adalah aplikasi sepenuhnya offline untuk mengenkripsi dan mendekripsi teks. Aplikasi ini tidak menggunakan internet sama sekali, dan semua tetap di ponsel Anda.
 
 Fitur:
-• Enkripsi Kuat: AES-256-GCM dengan derivasi kunci Argon2id (128 MiB, 4 iterasi)
-• Kotak Terenkripsi: Atur percakapan dalam kotak yang dilindungi kata sandi dengan kata sandi per kotak
-• Kunci Aplikasi: PIN dan Biometrik (sidik jari) terbuka dengan pengatur waktu kunci otomatis
-• Database Terenkripsi: Semua data disimpan dalam database terenkripsi SQLCipher
-• 100% Offline: Tidak diperlukan izin internet
-• Bagikan ke Kotak: Terima teks yang dibagikan dari WhatsApp, Telegram, dan aplikasi lainnya
-• Hapus Otomatis Pesan: Mengatur pesan agar dihapus otomatis setelah 1 jam hingga 90 hari
-• Perlindungan Tangkapan Layar: FLAG_SECURE mencegah kebocoran yang tidak disengaja
-• Pembuat Kata Sandi: Pembuat kata sandi acak bawaan
-• UI Modern: Desain Material 3 dengan tema gelap
+• Kotak Anonim: mengobrol di kotak yang dilindungi kata sandi, masing-masing dengan kata sandinya sendiri
+• Enkripsi kuat: AES-256-GCM dengan derivasi kunci Argon2id
+• Kunci Aplikasi: buka kunci dengan PIN dan sidik jari, dengan pengatur waktu kunci otomatis
+• Basis data terenkripsi (SQLCipher): tidak ada yang disimpan dalam teks biasa
+• Bagikan ke kotak: terima teks terenkripsi dari WhatsApp, Telegram, dan aplikasi lain langsung di kotak
+• Bagikan dari kotak: bagikan teks terenkripsi dari kotak pesan dengan aplikasi lain
+• Hapus pesan otomatis (1 jam hingga 90 hari)
+• Mode kunci kotak: tanya setiap kali, ingat sebentar, atau simpan untuk sesi
+• Pembuat kata sandi bawaan dengan indikator kekuatan
+• Perlindungan tangkapan layar di semua layar
+• Layar Bantuan dan Panduan dengan dokumentasi lengkap
+• Diterjemahkan ke 15 bahasa
 
-
+Bantu kami berkembang: laporkan masalah atau sarankan fitur di https://github.com/nemoXdev/CryptoSafe/issues, atau berkontribusi terjemahan di https://github.com/nemoXdev/CryptoSafe/blob/develop/app/src/main/assets/locales/README.md. Dengan kontribusi Anda, aplikasi ini terus membaik.

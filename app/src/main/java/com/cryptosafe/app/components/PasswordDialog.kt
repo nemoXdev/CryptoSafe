@@ -49,9 +49,6 @@ private val BoxBlack = Color(0xFF080808)
 private val BoxBorder = Color(0xFF333333)
 private val BottomBar = Color(0xFF293D3F)
 
-/**
- * زر على شكل "حبة" بألوان التطبيق (زيتي/ذهبي) — نفس زر شاشة القفل.
- */
 @Composable
 fun PillButton(
     text: String,
@@ -81,10 +78,6 @@ fun PillButton(
     }
 }
 
-/**
- * حقل إدخال كلمة المرور بنفس تصميم شاشة القفل:
- * خلفية بيضاء، حدّ زيتي 3dp يتوهج عند التركيز، زوايا 8dp، ارتفاع 50dp.
- */
 @Composable
 fun SafePasswordField(
     value: String,
@@ -135,11 +128,6 @@ fun SafePasswordField(
     }
 }
 
-/**
- * منبثقة بنفس تصميم شاشة القفل: صندوق أسود بحد رمادي وزوايا 12dp،
- * عنوان أبيض، زرّين على شكل حبة (زيتي للتأكيد، ذهبي للإلغاء)،
- * وشريط سفلي تزييني بلون التطبيق.
- */
 @Composable
 fun PasswordDialog(
     title: String,

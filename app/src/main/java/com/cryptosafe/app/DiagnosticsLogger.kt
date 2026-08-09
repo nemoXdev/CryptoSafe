@@ -5,25 +5,17 @@ import android.app.ApplicationExitInfo
 import android.content.Context
 import android.os.Build
 import com.cryptosafe.app.security.SecurePasswordStorage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/**
- * سجل تشخيص محلي بالكامل وآمن:
- * 1. يلتقط أي انهيار قاتل (FATAL) عبر معالج الاستثناءات العام.
- * 2. عند كل إقلاع يرصد إن كانت الجلسة السابقة انتهت بشكل غير طبيعي
- *    (API 30+: عبر ApplicationExitInfo حتى للانهيارات الأصلية/ANR،
- *    وإلا عبر علامة جلسة).
- * 3. يسجل حالة قاعدة البيانات عند الإقلاع (وجود الملف، حجمه،
- *    وجود مفتاح التشفير) — بدون أي محتوى حساس.
- *
- * ضمان الخصوصية: الملف يحتوي فقط تواريخ زمنية، أسماء كلاسات،
- * وأسطر stack trace (كلاس.دالة(ملف:سطر)). لا يُكتب هنا أبداً:
- * محتوى الرسائل، كلمات المرور، المفاتيح، أو رسائل الاستثناءات النصية.
- */
+
 object DiagnosticsLogger {
     private const val MAX_LOG_BYTES = 262_144L
     private const val MAX_TRACE_LINES = 80
@@ -38,6 +30,7 @@ object DiagnosticsLogger {
     private var initialized = false
 
     private val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+    private val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     @Synchronized
     fun initialize(app: Context) {
@@ -45,8 +38,8 @@ object DiagnosticsLogger {
         appContext = app.applicationContext
         val context = appContext ?: return
 
-        // معالج الانهيارات يُسجَّل فوراً؛ كل العمل الثقيل (قراءة/كتابة ملفات،
-        // استعلام أسباب الخروج) بالخلفية حتى لا يؤخر أول إطار للتطبيق.
+        
+        
         val previous = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             logThrowable(throwable, thread)
@@ -55,7 +48,7 @@ object DiagnosticsLogger {
 
         initialized = true
 
-        Thread {
+        backgroundScope.launch {
             try {
                 rotateIfOversized()
                 logEvent(
@@ -70,7 +63,7 @@ object DiagnosticsLogger {
                 logDatabaseState(context)
             } catch (_: Exception) {
             }
-        }.start()
+        }
     }
 
     private fun detectAbnormalTermination(context: Context) {
@@ -109,7 +102,7 @@ object DiagnosticsLogger {
         }
     }
 
-    /** يُستدعى عند إغلاق التطبيق بشكل طبيعي لتصفير علامة الجلسة (الأجهزة القديمة فقط). */
+    
     fun markCleanExit(context: Context) {
         if (Build.VERSION.SDK_INT >= 30) return
         try {
@@ -119,14 +112,15 @@ object DiagnosticsLogger {
         }
     }
 
-    /** يسجل حالة قاعدة البيانات دون أي محتوى حساس. */
+    
     fun logDatabaseState(context: Context) {
         try {
             val db = context.getDatabasePath("cryptosafe.db")
             val exists = db.exists()
             val size = if (exists) db.length() else -1L
             val hasPassphrase = SecurePasswordStorage.getDatabasePassphrase() != null
-            logEvent("INFO", "db_state exists=$exists size=$size passphrase_stored=$hasPassphrase")
+            val storageMode = SecurePasswordStorage.getStorageMode()
+            logEvent("INFO", "db_state exists=$exists size=$size passphrase_stored=$hasPassphrase storage_mode=$storageMode")
         } catch (e: Exception) {
             logEvent("WARN", "db_state_query_failed class=${e.javaClass.simpleName}")
         }
@@ -162,7 +156,7 @@ object DiagnosticsLogger {
         }
     }
 
-    /** يبقي أسطر الـ stack trace فقط ويرفض أي شيء آخر (رسائل، محتوى). */
+    
     private fun extractFrames(trace: String): String {
         val sb = StringBuilder()
         trace.lineSequence().forEach { line ->
@@ -210,7 +204,7 @@ object DiagnosticsLogger {
         }
     }
 
-    /** يعيد ملف تصدير واحد يضم السجل الحالي + السابق (إن وجد). */
+    
     fun getExportFile(): File? {
         val context = appContext ?: return null
         return try {
@@ -230,7 +224,7 @@ object DiagnosticsLogger {
         }
     }
 
-    /** معاينة مختصرة للسجل (آخر الأحرف) لعرضها داخل الإعدادات. */
+    
     fun getLogPreview(maxChars: Int = 4000): String {
         val file = getExportFile() ?: return ""
         return try {

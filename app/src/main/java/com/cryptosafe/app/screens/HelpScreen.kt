@@ -97,7 +97,7 @@ fun HelpScreen() {
                 Spacer(modifier = Modifier.height(8.dp))
                 HelpBullet(LocalizationManager.getString("help_lock_always"))
                 HelpBullet(LocalizationManager.getString("help_lock_timed"))
-                HelpBullet(LocalizationManager.getString("help_lock_session"))
+                HelpBullet(LocalizationManager.getString("help_lock_never"))
                 HelpBullet(LocalizationManager.getString("help_lock_permanent"))
             }
         }
@@ -303,6 +303,29 @@ fun HelpScreen() {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     LocalizationManager.getString("help_risks_desc"),
+                    style = MaterialTheme.typography.bodyMedium,
+                    lineHeight = 22.sp
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.medium,
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    LocalizationManager.getString("help_root_title"),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    LocalizationManager.getString("help_root_desc"),
                     style = MaterialTheme.typography.bodyMedium,
                     lineHeight = 22.sp
                 )

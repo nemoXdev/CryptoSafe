@@ -1,1 +1,1 @@
-Chiffrement de texte AES-256 militaire hors ligne
+Chiffrement de texte AES-256-GCM hors ligne avec Argon2id

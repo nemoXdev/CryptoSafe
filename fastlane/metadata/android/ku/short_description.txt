@@ -1,1 +1,1 @@
-نهێنیکردنی دەقی AES-256 سەربازی بێ ئینتەرنێت
+Şîfrekirina nivîsê ya AES-256-GCM a offline bi Argon2id

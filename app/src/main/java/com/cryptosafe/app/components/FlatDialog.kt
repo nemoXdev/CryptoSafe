@@ -22,11 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.cryptosafe.app.LocalizationManager
 
-/**
- * منبثقة بشكل مباشر وبسيط (مستوحاة من بنية نافذة كلمة المرور بتطبيق SSE المرجعي):
- * عنوان + محتوى + زرّين متساويي العرض ملاصقين لبعض بالأسفل، بدل الأزرار
- * الافتراضية الصغيرة المحصورة على جهة وحدة بنافذة AlertDialog القياسية.
- */
 @Composable
 fun FlatDialog(
     onDismissRequest: () -> Unit,

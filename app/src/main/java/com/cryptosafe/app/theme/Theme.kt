@@ -15,48 +15,38 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import com.cryptosafe.app.LocalizationManager
 
-/**
- * ثيم "خزنة ونحاس" (Vault & Brass)
- * ------------------------------------------------------------
- * فكرة التصميم: تطبيق عن الأمان والخصوصية والصناديق المشفّرة - بدل الألوان
- * التقنية الفاقعة المعتادة (تركواز/بنفسجي "AI عام")، اخترنا لوحة مستوحاة من
- * فكرة الخزنة الحقيقية: أخضر-تركوازي غامق هادئ (المعدن/الأمان) + نحاسي دافئ
- * (المفتاح/القفل)، على خلفية داكنة دافئة (مو أسود باهت افتراضي).
- *
- * للرجوع للثيم القديم: استبدل هذا الملف بنسخة Theme_Original_Backup.kt
- * (تم تسليمها كملف منفصل) - لا حاجة لأي تعديل بأي ملف آخر.
- */
 
-// ---- لوحة الألوان المسمّاة (Token System) ----
-private val Ink = Color(0xFF13201E)          // خلفية عميقة دافئة (مو أسود بحت)
-private val InkSurface = Color(0xFF1B2926)   // سطح البطاقات الأساسي
-private val InkSurfaceVariant = Color(0xFF25352F) // سطح مرتفع شوي (بطاقات ثانوية، فقاعات الدردشة)
-private val Paper = Color(0xFFEBE7DC)        // نص/محتوى - أبيض دافئ بلون الورق، مو أبيض صافي
 
-private val Vault = Color(0xFF5FAE9B)        // اللون الأساسي - تركوازي-أخضر هادئ (الخزنة)
+
+private val Ink = Color(0xFF13201E)          
+private val InkSurface = Color(0xFF1B2926)   
+private val InkSurfaceVariant = Color(0xFF25352F) 
+private val Paper = Color(0xFFEBE7DC)        
+
+private val Vault = Color(0xFF5FAE9B)        
 private val VaultOnPrimary = Color(0xFF08211C)
 private val VaultContainer = Color(0xFF2C5C50)
 private val VaultOnContainer = Color(0xFFD9F0E9)
 
-private val Brass = Color(0xFFD3A94F)        // اللون الثانوي - نحاسي دافئ (المفتاح)
+private val Brass = Color(0xFFD3A94F)        
 private val BrassOnSecondary = Color(0xFF2B2005)
 private val BrassContainer = Color(0xFF4A3A17)
 private val BrassOnContainer = Color(0xFFF3E3BB)
 
-private val Brick = Color(0xFFE0917A)        // للأخطاء/التحذيرات - طوبي دافئ، مو أحمر صارخ
+private val Brick = Color(0xFFE0917A)        
 private val BrickOnError = Color(0xFF3A130A)
 private val BrickContainer = Color(0xFF592A1D)
 private val BrickOnContainer = Color(0xFFF7DCD1)
 
-private val Outline = Color(0xFF5C6D66)      // حدود/فواصل هادئة
-private val MutedText = Color(0xFFB9C7C0)    // نص ثانوي (تواريخ، تلميحات)
+private val Outline = Color(0xFF5C6D66)      
+private val MutedText = Color(0xFFB9C7C0)    
 
-// ---- شكل حقول الإدخال "المملوءة": خلفية داكنة هادئة تنسجم مع الخلفية العامة،
-// وحدّ نحاسي بارز عند التركيز (بدل الخلفية الفاتحة الصفراء المتعبة للعين) ----
-val FieldFill = Color(0xFF25352F)            // خلفية داكنة هادئة (سطح مرتفع)
-val FieldFillFocused = Color(0xFF2A3B34)     // أفتح قليلاً عند التركيز
-val FieldText = Color(0xFFEBE7DC)            // نص فاتح يقرأ بوضوح فوق الخلفية الغامقة
-val FieldBorderFocused = Brass               // حد نحاسي بارز عند التركيز
+
+
+val FieldFill = Color(0xFF25352F)            
+val FieldFillFocused = Color(0xFF2A3B34)     
+val FieldText = Color(0xFFEBE7DC)            
+val FieldBorderFocused = Brass               
 
 private val VaultColorScheme = darkColorScheme(
     primary = Vault,
@@ -89,8 +79,7 @@ private val VaultColorScheme = darkColorScheme(
     inverseOnSurface = Ink,
 )
 
-// خط العناوين Serif (يدي إحساس "دفتر/سجل" مميز) + خط النص العادي.
-// الخطين مدمجين بالنظام (offline، بدون تحميل شبكة) - يحافظ على فلسفة "بدون إنترنت".
+
 private val VaultTypography = Typography().let { base ->
     base.copy(
         headlineLarge = base.headlineLarge.copy(fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold),
