@@ -137,6 +137,7 @@ object SecurePasswordStorage {
         return KeystorePrefs.getMode(context)
     }
 
+    @Synchronized
     fun getOrCreateDatabasePassphrase(): ByteArray {
         val existing = getDatabasePassphrase()
         if (existing != null && existing.isNotEmpty()) return existing

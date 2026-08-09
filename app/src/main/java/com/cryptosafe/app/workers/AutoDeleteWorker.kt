@@ -20,7 +20,8 @@ class AutoDeleteWorker(
                 com.cryptosafe.app.DiagnosticsLogger.logEvent("WARN", "auto_delete_worker_skipped_key_missing")
                 return Result.failure()
             }
-            val passphrase = SecurePasswordStorage.getOrCreateDatabasePassphrase()
+            val passphrase = SecurePasswordStorage.getDatabasePassphrase()
+                ?: return Result.failure()
             val database = AppDatabase.getInstance(appContext, passphrase)
             val boxDao = database.boxDao()
 
