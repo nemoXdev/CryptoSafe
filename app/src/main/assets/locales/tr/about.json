@@ -4,7 +4,7 @@
   "source_code": "Kaynak Kodu",
   "version": "Sürüm",
   "whats_new_title": "Yenilikler",
-  "whats_new_body": "Sürüm 2.1.0:\n• PIN ve biyometrik ile uygulama kilidi.\n• Şifrelenmiş sohbet ile anonim kutular.\n• Şifrelenmiş veritabanı (SQLCipher).\n• Diğer uygulamalardan paylaşım niyeti.\n• Ayarlar ekranı.\n• Otomatik mesaj silme.\n• Karakter sayacı.\n• Yardım ve Kılavuz.\n• Genel iyileştirmeler.",
+  "whats_new_body": "Sürüm 2.1.1:\n• PIN ve biyometrik ile uygulama kilidi.\n• Şifrelenmiş sohbet ile anonim kutular.\n• Şifrelenmiş veritabanı (SQLCipher).\n• Diğer uygulamalardan paylaşım niyeti.\n• Ayarlar ekranı.\n• Otomatik mesaj silme.\n• Karakter sayacı.\n• Yardım ve Kılavuz.\n• Genel iyileştirmeler.",
   "how_to_use_title": "Nasıl Kullanılır",
   "how_to_use": "• Uygulamayı kilitlemek için Ayarlar'da bir PIN ayarlayın.\n• Hızlı metin şifreleme için Şifrele/Şifreyi Çöz'ü kullanın.\n• Düzenli konuşmalar için Kutular oluşturun.\n• Herhangi bir uygulamadan şifrelenmiş metin paylaşın.\n• Kutulardaki mesajlar çözülene kadar şifreli kalır.",
   "disclaimer_title": "Sorumluluk Reddi",

@@ -1,0 +1,8 @@
+• Verschlüsselte Boxen (Chat) mit Passwörtern pro Box
+• App-Sperre mit PIN und biometrischer Entsperrung
+• Verschlüsselte Datenbank (SQLCipher)
+• Verschlüsselte Texte aus anderen Apps empfangen
+• Verschlüsselte Texte aus einer Nachrichtenbox an andere Apps weitergeben
+• Nachrichten automatisch löschen (1 Stunde bis 90 Tage)
+• Einstellungsbildschirm
+• Hilfe- und Anleitungsbildschirm mit ausführlicher Dokumentation

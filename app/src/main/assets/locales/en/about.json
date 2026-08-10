@@ -4,7 +4,7 @@
   "source_code": "Source Code",
   "version": "Version",
   "whats_new_title": "What's New",
-  "whats_new_body": "Version 2.1.0:\n• App Lock with PIN and Biometric.\n• Anonymous Boxes with encrypted chat.\n• Encrypted database (SQLCipher).\n• Share intent from other apps.\n• Settings screen.\n• Auto-delete messages.\n• Character counter.\n• Help & Guide.\n• General improvements.",
+  "whats_new_body": "Version 2.1.1:\n• App Lock with PIN and Biometric.\n• Anonymous Boxes with encrypted chat.\n• Encrypted database (SQLCipher).\n• Share intent from other apps.\n• Settings screen.\n• Auto-delete messages.\n• Character counter.\n• Help & Guide.\n• General improvements.",
   "how_to_use_title": "How to Use",
   "how_to_use": "• Set a PIN in Settings to lock the app.\n• Use Encrypt/Decrypt for quick text encryption.\n• Create Boxes for organized conversations.\n• Share encrypted text from any app.\n• Messages in boxes stay encrypted until decrypted.",
   "disclaimer_title": "Disclaimer",
