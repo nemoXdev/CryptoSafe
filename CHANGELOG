@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.1] - 2026-08-10
+
+### Removed
+- "View network connections" permission (ACCESS_NETWORK_STATE) that was merged automatically from the WorkManager dependency. The app never connects to the internet.
+
 ## [2.1.0] - 2026-08-07
 
 ### Fixed
@@ -15,7 +20,7 @@
   (ask every time / remember for a while / do not ask again this session)
 - Internal security hardening (authenticated encryption scheme versioning)
 
-## [2.0.0] - 2026-07-30
+## [2.0.0-beta] - 2026-07-30
 
 ### Added
 - Anonymous Encrypted Boxes with per-box passwords

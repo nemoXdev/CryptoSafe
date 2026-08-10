@@ -1,0 +1,8 @@
+• Kutu başına şifreler içeren Şifreli Kutular (Sohbet)
+• PIN ve Biyometrik kilit açma özellikli Uygulama Kilidi
+• Şifrelenmiş veritabanı (SQLCipher)
+• Diğer uygulamalardan şifreli metinler al
+• Mesaj kutusundaki şifreli metinleri diğer uygulamalarla paylaş
+• Mesajları otomatik olarak sil (1 saat ila 90 gün)
+• Ayarlar ekranı
+• Ayrıntılı dokümantasyon içeren Yardım ve Kılavuz ekranı

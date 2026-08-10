@@ -46,7 +46,7 @@ Your support means a lot! If you find CryptoSafe useful, please:
 
 
 
-[![GitHub release](https://img.shields.io/badge/release-v2.1.0-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
+[![GitHub release](https://img.shields.io/badge/release-v2.1.1-brightgreen)](https://github.com/nemoXdev/CryptoSafe/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Android%207.0%2B-green)](https://android.com)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)](https://kotlinlang.org)

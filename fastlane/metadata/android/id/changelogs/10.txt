@@ -1,0 +1,8 @@
+• Kotak Terenkripsi (Obrolan) dengan kata sandi per kotak
+• Kunci Aplikasi dengan PIN dan buka kunci Biometrik
+• Basis data terenkripsi (SQLCipher)
+• Terima teks terenkripsi dari aplikasi lain
+• Bagikan teks terenkripsi dari kotak pesan dengan aplikasi lain
+• Hapus pesan secara otomatis (1 jam hingga 90 hari)
+• Layar pengaturan
+• Layar Bantuan dan Panduan dengan dokumentasi lengkap
